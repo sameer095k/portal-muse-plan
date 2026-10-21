@@ -186,6 +186,7 @@ still waitlisted), or **the Portal itself** — always on, already on Wi-Fi,
 and with our fork it has hands. Sameer picked the Portal.
 
 - [ ] Fork command handlers speak the Samsung TV local API (WebSocket remote protocol; token pairing confirmed once on the TV) + Wake-on-LAN for power-on from off.
+- [ ] **TV prerequisite:** on the Q60D, Settings → General → Network → Expert Settings → **Power On with Mobile** ON (this keeps the TV's network side listening in standby — the same mechanism SmartThings uses to turn it on from a phone). The fork's wake sequence: remote-API power command first, Wake-on-LAN magic packet (TV's MAC, broadcast) if it's fully asleep, then wait for the API to come up before sending app launches. Hard limit: a TV that's unplugged or on a switched-off power strip can't be woken by anything except its physical remote.
 - [ ] Launch set: power on/off, volume, and his launcher's apps (Live TV, Netflix, Disney+, ESPN, Prime Video, YouTube) — "Hey Muse, put on the game" class commands.
 - [ ] Verify from the couch; log the TV's pairing token location privately (never in this repo).
 - [ ] If Home Link ever ships, re-evaluate: it may replace this path with Meta's published Samsung TV skill — keep whichever proves more reliable.
