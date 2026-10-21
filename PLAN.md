@@ -91,6 +91,7 @@ adb shell pm disable-user --user 0 com.facebook.portal.aiservice
 
 - The **presence** service matters most: Portal OS runs background person
   detection that does not light the camera LED.
+- **Keep-list (decided 2026-10-21): the WhatsApp and Messenger calling apps stay.** Calling is half of what this hardware is for; the calling apps are separate packages from the home-screen bloat, and Immortal's Calls tile bridges straight into them. Debloat targets the Portal home/login/presence surface, not the calling stack. If a calling app turns out to depend on a package on the disable list, the Phase 8 call test decides — calling wins.
 - Never disable `com.android.systemui` or anything outside the facebook/aloha set without a specific reason.
 - Every disable goes in LOG.md with its undo: `adb shell pm enable <package>`.
 - Meta's own docs warn modifying system apps via ADB "may not be reversible" — `disable-user` is the reversible form; we do not use `pm uninstall --user 0` on system apps.
@@ -127,6 +128,23 @@ the Tailscale option in the Muse app. Gives the "run your PC from another
 room" voice-terminal setup from the YouTube walkthrough. Heavier Meta-app
 footprint, so it's the last resort, not the goal.
 
+### Our fork — giving Muse hands (decided 2026-10-21)
+
+Upstream portal-muse is a conversation loop only: voice in, text/speech out.
+It cannot launch apps or affect anything on the device, because the Android
+ports never implemented the gadget *command* side (Meta's official SDK has
+one — the Linux gadgets expose `system.run`, `file.read`, custom commands).
+Since we're building from source anyway, our fork adds a small command set,
+triggered from Muse's side of the conversation:
+
+- **Launch an app by name** ("open photos", "open the recipe") → `startActivity`.
+- **Open the stored FaceTime link** (see Phase 8) in the browser.
+- **TV commands** (Phase 9) — the Portal sends them itself over the LAN.
+
+This fork is what turns the Portal from a speaker-with-a-screen into the
+house's voice remote. Scope stays small and local: a fixed command list, no
+arbitrary shell.
+
 ## Phase 7 — Network firewall + verification
 
 - [ ] Router/Pi-hole: block `facebook.com`, `graph.facebook.com`, `graph-portal.facebook.com`, `*.fbcdn.net`, and the rest of Meta's domains for the Portal's IP/MAC only (don't break the rest of the house).
@@ -141,7 +159,36 @@ footprint, so it's the last resort, not the goal.
 - [ ] Ask from another app (Muse bar overlays Immortal home).
 - [ ] Reboot: Immortal home returns, Hey Muse service resumes, no Meta login demanded.
 - [ ] 48h DNS log clean of Meta domains.
+- [ ] **WhatsApp video call** to a family member works end-to-end (the keep-list held).
 - [ ] Household note: anyone who speaks to it is recorded into the Muse account, like any voice note — Abeer knows it's there and what it does.
+
+### Experiment: FaceTime via link (join-only)
+
+FaceTime has no Android client, but since iOS 15 an iPhone can create a
+**FaceTime link** (`facetime.apple.com/join#...`) that Android/Windows join
+from a browser. Test on setup day:
+
+- [ ] Sideload Chrome via Aurora Store (Apple's web client officially supports Chrome/Edge; the stock Portal browser is the unknown).
+- [ ] Create a link on the iPhone, get it onto the Portal (below), join, and confirm Portal camera + mic work in Apple's web client; the iPhone host admits it.
+- [ ] Fallback if the browser is refused: AirPlay-mirror the call from the iPhone via Wormhole Display.
+
+**Getting the link onto the Portal** (typing that URL is not happening):
+1. **Standing link (best):** FaceTime links stay valid until deleted. Create one "Family FaceTime" link once, beam it over by any method below, and bookmark it as a tile/bookmark on the Portal. After that: tap tile → host admits → call. No per-call delivery.
+2. **WhatsApp it:** a family member (or Sameer) sends the link in WhatsApp; on the Portal, tap it in the chat → opens in the browser → join. Uses the calling app we're keeping anyway.
+3. **By voice, once the fork lands:** "Hey Muse, open the FaceTime link" → the fork opens the stored link.
+
+## Phase 9 — TV control, Portal-as-bridge (his pick, 2026-10-21)
+
+The Samsung Q60D only accepts control commands from inside the LAN, and Muse
+lives in the cloud — something awake at home has to relay. Candidates were
+the Mac (works, but it lives off in a drawer), the Home Link dongle (ideal,
+still waitlisted), or **the Portal itself** — always on, already on Wi-Fi,
+and with our fork it has hands. Sameer picked the Portal.
+
+- [ ] Fork command handlers speak the Samsung TV local API (WebSocket remote protocol; token pairing confirmed once on the TV) + Wake-on-LAN for power-on from off.
+- [ ] Launch set: power on/off, volume, and his launcher's apps (Live TV, Netflix, Disney+, ESPN, Prime Video, YouTube) — "Hey Muse, put on the game" class commands.
+- [ ] Verify from the couch; log the TV's pairing token location privately (never in this repo).
+- [ ] If Home Link ever ships, re-evaluate: it may replace this path with Meta's published Samsung TV skill — keep whichever proves more reliable.
 
 ## Known limits (accepted up front)
 
