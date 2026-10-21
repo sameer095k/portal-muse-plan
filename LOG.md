@@ -1,0 +1,18 @@
+# LOG
+
+Newest first. Every change made on the device gets an entry: what, the exact
+command, and its undo. Sessions where Sameer's hands are on the device and
+Muse is remote eyes get dated headers like his TV project logs.
+
+## 2026-10-21 — Plan repo created (no device yet)
+
+- Portal bought (see 2026-10-21 entry below). Device in transit, ETA Oct 23–26.
+- Researched and wrote PLAN.md / RESOURCES.md. Key finds of the day:
+  - `wobsoriano/portal-muse` — hands-free "Hey Muse" app; built for Gen 1, probe-first on our Gen 2.
+  - `wobsoriano/immortal-glass` — launcher + provisioning kit, explicitly supports API 29 (our model).
+  - Bootloader unlock is hard-refused → no root; plan is disable + firewall only.
+
+## 2026-10-21 — Bought the device
+
+- eBay itm/168808167061, seller Apparel West (Orange, CA): open-box/unused WD50JM, $45.99 + free shipping, **$50 total** with tax. Power adapter included per listing; 30-day returns (buyer pays).
+- Backstory: his $100 sealed-new OfferUp find was the ceiling; the $20 Ontario OfferUp WD50JM seller never replied; a $35 Chino listing turned out to be first gen (seller confirmed — its photo was a Gen 2 stock image). First gen was ruled out for the main build: minSdk 28 narrows app compatibility and it's the weaker fit all around.
