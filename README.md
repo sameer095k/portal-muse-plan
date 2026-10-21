@@ -29,6 +29,10 @@ while the hardware camera shutter and mic mute remain the physical guarantee.
 
 - [PLAN.md](PLAN.md) — the phased build plan, with exact commands and the
   decision points (probe results decide the Muse route).
+- [FEATURES.md](FEATURES.md) — what lives on the Portal once it's built:
+  his wishlist (calendar, grocery, photos, calls, texts, games, word of the
+  day, prayer times, the dashboard) vetted feature-by-feature, plus extras
+  found in Immortal's app store.
 - [RESOURCES.md](RESOURCES.md) — every source, annotated: what it is, what we
   take from it, and how much we trust it.
 - [LOG.md](LOG.md) — session log. Every change made on the device gets an
