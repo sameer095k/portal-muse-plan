@@ -64,5 +64,7 @@ https://forum.xda-developers.com/t/anyone-been-able-to-do-anything-with-a-facebo
 
 ## Community
 
-- **r/FacebookPortal** — where most of this surfaced (the portal-muse announcement thread Sameer sent, the u/keremimo installer-overlay discovery). Check before Phase 3 for any Gen-2-specific portal-muse reports.
+- **r/FacebookPortal** — where most of this surfaced (including the u/keremimo installer-overlay discovery). Check before Phase 3 for any Gen-2-specific portal-muse reports.
+  - The thread Sameer sent (Oct 5, 2026): **"Muse x Meta Portal +"** by u/Potential-Noise5819 — https://www.reddit.com/r/FacebookPortal/comments/1wyh86i/muse_x_meta_portal/ — a link post (to a Threads share) about their own DIY build: they had an AI coding agent integrate Meta's Portal dev docs + the official gadget SDK into a custom app — tap-to-talk, preset questions, prompts sent from the phone app. Their one caveat matches our Phase 2: do the Portal dev-doc setup first. No Gen 1 vs Gen 2 notes in the post or comments.
+  - Its one substantive comment (u/Uglyjuggler) is a Route C variant worth stealing: Portal → Muse over **Tailscale**, with Muse holding its own Tailscale login + an SSH key into the home PC under a **regular non-admin user**, and a ~10-second kill switch (remove the device in Tailscale or delete the SSH key). If we ever run Route C, we run it that way — least privilege, revocable.
 - **Hacker News** — "Meta enables ADB on deprecated Portal devices" thread (Jun 2026) for the official blog link (developers.meta.com/horizon/blog) and early adopter reports.
