@@ -4,6 +4,13 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-25 — Dashboard feedback fixes + it is now interactive
+
+Sameer's morning notes (photo of the day theme — auto light/dark works): (1) grocery **Later list killed** (Now only); (2) **"Iqamah" relabeled "IOK"** (CHESS line unchanged beneath); (3) **Isha card was clipped** at the right edge — layout rebalanced (370px left column, tighter gaps) and verified fully on-screen; (4) date now always from the device clock (was the snapshot's, a day stale); (5) next-prayer line no longer wraps "PM".
+
+- **Interactivity (his big one):** taps inside the screensaver can never reach the page — a tap dismisses the Android dream by design, which is why the Urdu button "went home". Fix: DashServer **v3** — its launcher activity ("Dashboard") is now a **full-screen WebView** of the same page (JS on, autoplay allowed, keep-screen-on), and Immortal's Screensaver setting **"Open when you tap to exit" → Dashboard**. Flow verified end-to-end by remote taps + device logs: idle → dream shows the dashboard; **tap → the interactive Dashboard opens**; **play button → the Urdu clip actually played** (audio HAL start_output_stream at the tap instant). The dream stays the glanceable twin; the app is the tappable twin — same files, same server. Upload allowlist also gained /index.html so page fixes can ride the push pipe.
+- Pushed today's fresh snapshot by cable while ADB was still up: the word had already rotated at 05:48 (serene / سکون sukoon) with new audio — delivery was the only missing piece, exactly what the Tailscale pipe closes.
+
 ## 2026-10-24 (midnight) — Dashboard LIVE on the Portal, fully local; Tailscale push prepped
 
 - **Immortal's web-page field rejects `file://`** (verified on screen: "Start the address with http:// or https://", button stays greyed). Muse drove the Portal remotely via adb input + screencaps (also unstuck Sameer from a settings page — Portal has no visible Back in Immortal settings; KEYCODE_BACK works).
