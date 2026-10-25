@@ -4,6 +4,13 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-25 (midday+) — Google client built and staged; waiting on his service-account key
+
+- His call: a scoped Google key on the Portal is fine. Route: service account shared only the grocery sheet (Editor) + his calendar (See all event details). Steps given to him (Cloud console: project → enable Sheets + Calendar APIs → service account → JSON key on the Mac → share both) — key lands via cable into the app's private files, never chat.
+- **DashServer v4 built + installed**: GoogleClient (SA JWT→OAuth token, RS256 via java.security, org.json — no new deps) + PortalApi behind /api/grocery (read values + cell fills; green = bought, and the write color is *calibrated from the first green cell the read finds*, matching his sheet marks), /api/grocery/toggle (batchUpdate fill), /api/grocery/add (values append), /api/agenda (calendarList + today's events, same shape as the snapshot agenda). No key on device → all endpoints 501 (verified live via adb forward).
+- **Page**: Groceries card now opens a full-screen grocery view (Now + Later, big tappable rows; in live mode a tap greens/ungreens the sheet cell and an Add row appears). Verified in snapshot-fallback mode on-device. The agenda also goes live from the key automatically (loadLiveAgenda every 5 min) once the key exists.
+- Sidebar findings (his question): WhatsApp/Messenger on Portal OS are `com.facebook.aloha.app.whatsapp` / `.messenger` — system services with NO launcher activity; installed + enabled (debloat-safe); his number linked at setup; usage is the Immortal Calls tile; relink lives in Portal Settings → Accounts. FaceTime remains join-only via an iPhone-created link in the Browser (not yet created).
+
 ## 2026-10-25 (midday) — Next-prayer block killed; weather + prayer are now full-screen tap views
 
 - **Next-prayer section removed** (his call: redundant with the highlighted card). The countdown logic still runs internally (card highlight + azan firing); it just isn't displayed on the home page anymore.
