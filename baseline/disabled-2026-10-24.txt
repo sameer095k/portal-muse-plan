@@ -1,0 +1,5 @@
+Portal debloat record — 2026-10-24 (pm disable-user --user 0; undo: pm enable <pkg>)
+Provisioning kit disabled: com.facebook.appverifier, com.facebook.aloha.alohaotasetup, com.facebook.aloha.otaui, com.facebook.alohaapps.devicesetup
+Muse batch 1: com.facebook.alohaservices.presence, com.facebook.portal.aiservice, com.facebook.aloha.analytics
+Muse batch 2: com.facebook.aloha.app.portalfeed, com.facebook.aloha.app.storytime, com.facebook.alohaapps.personaluser, com.facebook.alohaservices.alohausers, com.facebook.aloha.deviceidentity, com.facebook.alohaapps.bugreporter, com.facebook.aloha.cnshealthmonitor, com.facebook.aloha.platformmobileconfig
+Kept enabled (verified): com.facebook.aloha.app.whatsapp, com.facebook.aloha.app.messenger, com.immortal.launcher, stock launcher (recovery), settings, TTS services
