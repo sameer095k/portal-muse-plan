@@ -4,6 +4,53 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-25 (afternoon) — WhatsApp video FIXED: the AI camera services are on the camera path
+
+- The sideloaded real WhatsApp (companion-linked by Sameer) placed calls, but
+  his video was black on both his preview and the far side. Permissions were
+  granted and the log showed the camera opening — then dying ~4 s in:
+  `Camera3-OutputStream: Error queueing buffer to native window: No such
+  device (-19)`, followed by CameraService disconnect. Not the shutter
+  (he opened it; no change).
+- Cause: the debloat had disabled `com.facebook.portal.aiservice` and
+  `com.facebook.alohaservices.presence`, which sit on this firmware's camera
+  path. **Fix: `pm enable` both → video works immediately** (his test call).
+  Disabled count 12 → **10**. Undo: `pm disable-user` both (video calls in
+  the sideloaded app break again).
+- Open decision (his): keep both on for video, or trim back and lose video.
+  The Phase 7 router firewall remains the network-side mitigation either way.
+
+## 2026-10-25 (afternoon) — v2 dashboard BUILT: side rail + persistent view, Usuals, Photos, app-launch doors
+
+Approved as proposed (his cuts held: no quantity, no store tags, no delete confirmations, no home automation). Shipped as **DashServer v6 + page v2**, all verified on-device:
+
+- **Side rail** (Home / Prayer / Weather / Groceries / Photos) on the left of both twins. Selection persists **server-side** (`/api/ui-state` → `ui-state.json` on the device); the app POSTs on tap, both twins poll every 15 s. **Verified:** state set to Photos → device idled → the *screensaver itself* opened on the Photos slideshow (1 dream start, 0 stops, screenshot). No auto-home, ever.
+- **Groceries two-pane:** live list (tap = green, ✕ = instant delete — add/delete round-trip proven on a scratch item, real list untouched) + **Usuals panel**. New endpoints `/api/usuals` + `/api/grocery/delete`; the Usuals sheet tab **auto-created and seeded** by the Portal itself on first read (Pantry/Apple cider vinegar, Personal care/Pads, Household/Metal spatula, Treats/Lindt roll — from his actual list; he/Abeer edit the tab in Sheets). Tiles dim when the item is already on the list; tapping a dim tile does nothing (no duplicates).
+- **Photos:** local `photos/` folder; `/api/photos`, `/api/photos/upload-open` (10-minute window, returns the LAN URL `http://192.168.1.117:8321/photo-add`), and a multipart `/photo-add` page for the phone (403 when the window is closed). Upload proven end-to-end with a test image (shown in the slideshow, then removed). Slideshow advances every 30 s in the Photos view; undecodable files (HEIC) are skipped automatically. The iOS Shortcut recipe (Convert to JPEG → POST) is the intended phone path; the web page is the fallback.
+- **Phone/Chrome bug — diagnosed and our side fixed.** Two stacked causes: (1) Immortal's home has **no real Chrome tile** — its "Browser" tile is Meta's Portal Browser; (2) every screensaver exit funnels to the Dashboard app, and Immortal's frame-hold (REDREAM → PhotoFramePreviewActivity) re-covers the screen after Meta's force-wakes, so other apps feel unreachable. Fix shipped in our code: the app twin loads with `?app=1` and MainActivity now intercepts `portal://launch/<pkg>` / `portal://apps` — the rail gained a **◎ button that launches the real org.chromium.chrome** (verified: Chrome is the resumed foreground activity after the tap) and a **▦ button that opens Immortal's app grid** from anywhere.
+- **What still blocks Chrome visually (his tap, not ours):** the firmware puts Meta's "Share data to improve Portal Browser?" consent sheet in front of browser use (it's what the screenshot kept showing, identical both times). Leave the checkbox **unchecked**, tap Continue once — it never comes back. Chromium's own first-run is behind it (also his tap-through; pairs with the WhatsApp Web QR step).
+
+## 2026-10-25 (midday+) — Later section removed from grocery view; Home HQ (joelgaff) reviewed as the grocery/rail reference
+
+- His call: kill the Later section in the Portal grocery view. Done — the full-screen view is now a single "Groceries" list (Now items) + Add row, screenshot-verified on device. The sheet's column B still exists; the Portal ignores it. (One test tap during the change marked "metal spatula" green in the sheet; the Portal-side un-mark won't clear that one cell — flagged to him, fixable from the Sheets side if he wants.)
+- Reference review (his X link): **Home HQ** by Joel Gaff — github.com/joelgaff/home-hq (MIT, Rails 8 + Hotwire + SQLite) — literally the productionized build of Wes Bos's Home HQ prototype (the same prototype behind his pinned photo-frame project). What he liked, concretely: (1) the grocery screen = list on the left + a **catalog side panel** of tappable item tiles (grouped by category, tap adds with a toast), items carrying a store tag + quantity stepper, filter by store; (2) the slim **left icon rail** for switching views. Full mapping of borrowable features vs our stack delivered to him as a report; build waits on his pick (design-first rule).
+
+## 2026-10-25 (midday) — Google key LIVE: Portal reads/writes the grocery sheet directly, agenda live
+
+- Key found where he dropped it: `/Users/Sameer/portal-*.json` on the Mac (his Finder home — reachable; `~/Downloads` is TCC-walled to SSH). His Mac has two home folders: `/Users/User` (SSH working home) and `/Users/Sameer` (his GUI home) — files for Muse go in either home folder.
+- First load attempt hit `run-as: package not debuggable` (DashServer is a release-style raw-toolchain build). Fixed properly instead of making the app debuggable: **DashServer v5** adds a token-guarded `PUT /upload/sa-key.json` that writes into the app's *private* files dir. Key imported that way; the /sdcard temp copy was deleted in the same run.
+- First calls returned Google's "API has not been used in project … or it is disabled" for both Sheets and Calendar (auth itself worked — Google accepted the SA token). He enabled both APIs in project portal-512718; retest went green immediately.
+- **Verified end-to-end on-device:** `GET /api/grocery` returns the real sheet (Now: Lindt roll r1, Apple cider vinegar r10, Pads r11; Later: metal spatula). **Write proof:** toggled Pads bought → read back `bought:true` (the actual Sheet cell went green) → toggled off → white again. `GET /api/agenda` returns 200 (today genuinely empty; first real event will be the content proof of the calendar share). The grocery view on the Portal flipped to live mode (tappable rows + "Add an item" row) — screenshot-verified.
+- SA identity: `portal@portal-512718.iam.gserviceaccount.com`; key lives ONLY in the app's private storage on the Portal + his spare copies (Mac home, phone). Never in chat, this repo, or memory.
+- WhatsApp Web thread (his find, people online are right that it's the chat route): real Chromium (`org.chromium.chrome`) is installed and is the default browser — WhatsApp Web's requirement. It sits at Chrome's **first-run wizard** (never completed). Remaining gates are his hands: tap through first-run (no sign-in), then scan the WhatsApp QR with his phone. Window-stacking on this firmware made remote screencaps unreliable during the attempt (dashboard kept compositing over Chrome) — finish it in the room.
+
+## 2026-10-25 (late morning) — Calls-tile glitch loop: diagnosed, unwedged, dream stable again
+
+- His report: tapping Immortal's phone (Calls) tile opened nothing and started a flicker loop between the stock photo screensaver and our dashboard. Root cause, from Immortal's own source + device logs: the Calls tile *bridges to Meta's stock home* (launchStockHome → markBridge); on this firmware the stock home process starts but never surfaces a window — and its background process then churns dream state (dream start → system wake ~0.6 s → restart, endlessly; the composite screenshot showed Immortal's clock-face frame layered over our dashboard). Meta's Superframe also still registers a DreamService, which muddies the water further.
+- Fixes applied: re-enabled `alohaapps.personaluser`, `alohaservices.alohausers`, `aloha.deviceidentity` (user/contacts identity the stock home needs — calling wins over debloat; disabled count 15 → 12), then **force-stopped the wedged stock-launcher process**. Controlled retest: screen timeout 15 s, 40 s window — **dream starts 1, stops 0**; the dashboard dream is stable again (screenshot-verified).
+- **Still open (his call):** the Calls tile itself remains a dead end on this firmware — the handoff doesn't complete. Incoming WhatsApp/Messenger calls still ring the Portal (wrapper-level, home-app-independent). Outgoing calls need either the stock home as default (big trade) or the Phase 9 voice fork. Recommendation on the table: hide the Calls tile so it can't re-trigger the wedge.
+- Key file: he has the SA key on his iPhone ("saved to download", then "moved") — not yet located on the Mac (Downloads is TCC-walled to SSH; the home-folder drag didn't surface it). Location TBD with him.
+
 ## 2026-10-25 (midday+) — Google client built and staged; waiting on his service-account key
 
 - His call: a scoped Google key on the Portal is fine. Route: service account shared only the grocery sheet (Editor) + his calendar (See all event details). Steps given to him (Cloud console: project → enable Sheets + Calendar APIs → service account → JSON key on the Mac → share both) — key lands via cable into the app's private files, never chat.
