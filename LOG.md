@@ -4,6 +4,12 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-25 (midday) — Next-prayer block killed; weather + prayer are now full-screen tap views
+
+- **Next-prayer section removed** (his call: redundant with the highlighted card). The countdown logic still runs internally (card highlight + azan firing); it just isn't displayed on the home page anymore.
+- **Tap weather → full-screen weather view** (in-page, fed by the same Open-Meteo pull, extended to hourly + 8-day): current conditions, a 12-hour strip, and the week (verified on-device: Sat shows rain). **Tap any prayer card → full-screen prayer view**: big "Dhuhr 12:36 PM · in 1h 37m" header, all six prayers at reading size with IOK/CHESS iqamah, next one outlined; rows tightened so all six fit without scrolling. ✕ or a backdrop tap closes either view. Both verified by remote taps + screencaps.
+- **Grocery app: parked on his thinking** — he saw a design on Twitter he liked; the dashboard card stays read-only from the sheet snapshot meanwhile. When he surfaces the post, match its design; a real app version needs the write path back into the sheet (the read path exists via the snapshot).
+
 ## 2026-10-25 (later) — Word source switched to Transparent Language; seconds killed; tabular figures
 
 - **Word of the day now comes from Transparent Language** (his link): the daily job reads their RSS feeds (FeedBlitz: urdu-word-of-the-day + english-word-of-the-day-for-spanish). Quirks found: feed UA matters (browser UA → subscribe page, plain UA → XML); their English feed is for Spanish speakers, so the English slot takes the word + its example sentence as the sub-line. The feeds carry no audio, so clips are still generated (EN local TTS; UR Google TTS speaking word ×2 + the feed's Urdu example sentence). Transliteration comes from the feed's wotd field when present (today: none — نیپکن is a loanword). Fallback: the local 20-pair bank if a feed ever fails — never wordless. First Transparent pair on-device: **leash / نیپکن (napkin)**.
