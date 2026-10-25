@@ -4,6 +4,15 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-24 (midnight) — Dashboard LIVE on the Portal, fully local; Tailscale push prepped
+
+- **Immortal's web-page field rejects `file://`** (verified on screen: "Start the address with http:// or https://", button stays greyed). Muse drove the Portal remotely via adb input + screencaps (also unstuck Sameer from a settings page — Portal has no visible Back in Immortal settings; KEYCODE_BACK works).
+- **DashServer built** (source `~/workspace/dashserver-src/`, built on the Mac with javac/d8/aapt2 — no Gradle): `com.sameer.dashserver`, a foreground service serving `/sdcard/portal-dashboard` on port **8321, all interfaces** (localhost for Immortal + tailnet for pushes), autostart on boot, wake-lock held. Immortal's Photo source → Web page set to **http://127.0.0.1:8321/index.html** (selected + saved, verified on screen). The screensaver engaged and rendered the dashboard on-device — screenshot verified (clock/countdown/prayer/groceries/word band all live).
+- **Screen timeout note:** temporarily set to 15 s to trigger the screensaver test, restored to 600000 (10 min); the original value was lost to a garbled command — disclosed to Sameer.
+- **Push endpoint (v2):** `PUT /upload/data.json|audio/wotd-en.mp3|audio/wotd-ur.mp3`, Bearer-token guarded (token baked into the APK; copy in `~/workspace/portal-dashboard/.dash-token`, chmod 600). Verified: 401 no token, 403 wrong path, 200 + byte-exact file for good pushes. Two build bugs found and fixed on the way: missing WRITE_EXTERNAL_STORAGE (writes silently failed) and 100-continue handling.
+- **Direction of the pipe (his pick: Tailscale, setup tomorrow with him):** Muse's VM is a tailnet *client only* (accepts no inbound), so the snapshot flows as a PUSH from the VM to the Portal. Prepped tonight: `push_snapshot.py` (rebuilds data.json, PUTs the 3 files via the tailnet proxy) + cron `portal-dashboard-snapshot-push` every 30 min — silent no-op until `portal-push.json` exists. **Tomorrow:** install Tailscale on the Portal (his sign-in), `tailscale up` the VM (his approval), approve the Portal address, write `portal-push.json`, watch one push land.
+- **Leftover:** Muse Probe app still on the Immortal home screen (his to delete).
+
 ## 2026-10-24 (late) — Pairing fixed, Hey Muse live, dashboard v1 built
 
 - **Pairing timeout root-caused to an upstream bug:** `GattPeripheral.kt:85` required `SDK_INT == Build.VERSION_CODES.P` (exactly Android 9) — Gen 2 runs API 29, so pairing refused to start and the UI called it a timeout. **Our fork's first patch:** `!=` → `<` (at least Android 9). Rebuilt on the Mac, reinstalled with `adb install -r -g` (token + name survived). Pairing then succeeded first try — logs: "Noise session established", "registered with Muse" 22:52; `muse.json` present in app files. Device LAN IP **192.168.1.117** (TV is .118).
