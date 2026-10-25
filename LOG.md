@@ -4,6 +4,28 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-25 (evening) — Calendar week view + add-from-screen, multi-album photos, groceries portrait fix
+
+Evening build session (design locked with Sameer in chat first, per the design-first rule), shipped as **DashServer 6.1 → 6.2 + page updates**, all verified live on-device or against Google directly:
+
+- **Groceries portrait fix.** The two panes stayed side-by-side in portrait, which crushed both add rows (the "New usual" field clipped mid-word). Portrait now stacks them: list on top with a full-width "Add an item" row, Usuals below. Page-only change, pushed via DashServer `PUT /upload/index.html`.
+- **Calendar 📅 view** built to his locked spec — Skylight-inspired week view: header reads **"Sameer&Abeer"**, week ‹ › navigation, **no ✕** (the rail is the way out), **no clock, no weather** in the header, and **no person split** — no initials, no per-person colors; the data can't attribute events to a person yet, so every event renders in one gold tint. Landscape: hourly day columns (grid 6 AM–11 PM), all-day strip under the day headers, events under 45 min show title only so nothing clips; today column tinted, its number gold. Portrait: stacked day cards, today outlined. Gold **+** button opens the add form (Title / Date / Start / End / All-day).
+- **Calendar data = a union of three sources**, deduped by *instant* (title + epoch-ms start/end): the snapshot `calweeks` (build_data.py, all his calendars, ±5 weeks), the live Family-calendar read, and the on-device add queue. Dedupe by instant, not by string — the same event legitimately appears on two calendars with different offset spellings (`09:30-07:00` vs `16:30Z`).
+- **Photos multi-album.** Albums are folders on the device and "move" was exclusive by construction. New `POST /api/photos/copy`, and the edit-mode action is now **"Add to"**: the photo is copied into the chosen album and stays where it was, so one photo can live in several albums; delete still removes only that album's copy. `/api/photos/move` is unchanged (round-trip tested: create album → copy in → move back → clean up; library left exactly as found).
+- **Rail icons.** The 📅 emoji (renders as somebody else's fixed date) and the ▣ dingbat are gone — both are now inline SVG line icons in the rail's own stroke style. The calendar icon shows **today's date number**, set by JS from the device clock and refreshed every 30 min.
+- **DashServer trail.** 6.0 (v2 dashboard) → **6.1**: `GET /api/calendar`, `POST /api/calendar/add` (queue to `cal-queue.json`) + `POST /api/calendar/dequeue`, `POST /api/photos/copy`, `/api/ui-state` whitelist gains `"calendar"` → **6.2**: native adds (below). Same signing cert throughout; built on the Mac (~/dashbuild/build.sh) and installed with `adb install -r`.
+- **Native adds (6.2).** `/api/calendar/add` now inserts **directly into the Family calendar**; the queue + build_data.py drain remain only as the fallback if a direct insert fails (logcat prints a `DIRECT` line vs a fallback line, so the path taken is never a guess). **Proven live:** test event posted to the Portal API → Google returned id `a6mveae504s3goj1kbfmd74dpg` → independently confirmed in Google Calendar at 2026-10-26 9:00–9:30 AM PT → queue file untouched → test event deleted. The Dec 18–21 window now reads back all 5 Family events live, matching ground truth.
+
+**Learnings (durable):**
+
+- **A calendar shared with a service account may never appear in the SA's `calendarList`** — Family never did, despite the share existing since setup. That, not missing event data, is why live reads returned `[]` for a day. Fix shipped: the read path appends Family as a guaranteed entry and queries events **by calendar ID directly**; list membership is not required. `calendarList.insert` can't cure it from the SA side — it needs the full `calendar` scope, broader than granted.
+- **Scope arithmetic.** `calendarList.list` rejects a token holding only `calendar.events` (403 "insufficient authentication scopes"). The SA's shipped scope is a *superset*, not a swap: `spreadsheets` + `calendar.readonly` + `calendar.events`.
+- **Share boundary (Sameer's call, 2026-10-25).** Family calendar → the SA is **writer** (his manual share had landed reader-only on Family and nowhere on primary; the bump to writer was applied via ACL update through his own OAuth). His **primary calendar is deliberately NOT shared** with the SA — every server-side calendar operation targets Family or the SA's own list, and that boundary stays.
+- **Deploy gotcha.** `curl --data-binary @~/file` does **not** tilde-expand after the `@` — it silently sends a 0-byte body, and DashServer faithfully wrote empty `index.html`/`data.json` once during the 6.1 deploy (recovered by re-PUT). Rule: **absolute paths in `--data-binary`, and md5-verify the served file after every PUT.**
+- **Design rule, confirmed twice today:** kill chrome that duplicates a system affordance (the view ✕ next to the rail), and never render a split (people, colors) that the data can't back up.
+
+**Undo:** page → re-PUT the previous `index.html` (now in git history in the portal-dashboard repo); DashServer → reinstall the previous APK; Family share → drop the SA's role back in Google Calendar → Family → Share with specific people.
+
 ## 2026-10-25 (afternoon) — WhatsApp video FIXED: the AI camera services are on the camera path
 
 - The sideloaded real WhatsApp (companion-linked by Sameer) placed calls, but
