@@ -4,6 +4,15 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-26 (afternoon) — Photo shuffle order (DashServer 6.11)
+
+- **Sameer's ask:** the carousel walked photos sequentially; he wanted it to shuffle randomly through the selected album.
+- **Design (his tap, from two options explained in chat):** Order chips in Photos settings — **Sequential / Shuffle** — beside the Rotate chips; Shuffle ships ON. While shuffling, each step draws from a bag of the album's not-yet-shown photos (no repeats until the album has shown once, then a fresh bag); Prev walks back through the photos actually shown (history trail, capped at 60). The pin still wins over both orders. The pin button's flipped label was renamed **Shuffle → Unpin** so the word means one thing.
+- **DashServer 6.11 (vc 21):** ui-state merge gains `order` (validated: "seq" | "shuffle", anything else becomes "shuffle") alongside rotate/pin — server-shared, so the app and screensaver faces can't split on it (the 6.10 lesson). Page: PHORDER state (localStorage seed/fallback, default "shuffle"), posts with the other photo settings, adopted in syncViewState under the same 20 s guard; the app face seeds the key once on installs that predate it. Bag/history keyed by photo path (no ?v= stamp), cleared on album switch and order change. BUILD NOTE: dashbuild-vm's source copies had gone stale (pre-6.10 DashService, older OnDevice) — re-synced from dashserver-src and md5-verified before this build.
+- **Verified:** production stepPhoto simulated in node against a 10-photo album, 25/25 (no repeats in a round, new round re-draws, prev walks back, pin snap intact, seq mode unchanged). Server round-trip: POST order merged with other keys untouched; a bogus value sanitized. On-device: settings sheet shows ORDER chips with Shuffle gold; one Next tap from photo #0 landed on **#53 of 62** (20261025-131916-516-3.jpeg, Us album — sequential would have been #1), read back via the pin row. State left clean: `{view:photos, rail:false, album:All, rotate:60000, pin:null, order:shuffle}`.
+- **Commits:** page `03f3ca50`, APK archived `apks/dashserver-6.11.apk` (`cbeea439`).
+- **Undo:** set Order → Sequential in Photos settings (behavior identical to pre-6.11); server rollback = reinstall `apks/dashserver-6.10.apk` (the stored order key goes inert).
+
 ## 2026-10-26 (afternoon) — Built-in WhatsApp signed out; the real app is the only Portal WhatsApp now
 
 - Sameer saw two linked devices on his phone's WhatsApp and logged the **built-in** Portal client (linked during the Oct 24 takeover) out from iPhone → WhatsApp → Settings → Linked Devices. To tell them apart, Muse opened the sideloaded app on the Portal first so its entry showed active-now (the keeper); he removed the stale one.
