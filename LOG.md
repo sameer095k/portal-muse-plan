@@ -4,6 +4,32 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-25 (night) — Photos immersive: drawer hidden = photo options hidden
+
+- **His ask:** "hide all the photo options if we hide the drawer on that
+  page so its an immersive picture only." Done — on the Photos page,
+  hiding the rail now takes every piece of photo chrome with it: the
+  bottom photo bar (Prev / Next / Add photos / Edit / Show only this /
+  filename / ⚙), the album chips with their counts, and the new-album
+  row. The picture fills the page; nothing else is on screen.
+- **How:** no new state — one CSS rule keyed off the rail's own
+  `body.railoff` (app mode, viewing state only):
+  `body.app.railoff #phview.open:not(.editing)` hides `#phbar`,
+  `#phchips`, `#phnewrow`. The › edge tab that restores the drawer lives
+  outside the view and stays put, so the way back is the same tap as
+  always — and restoring the drawer brings the photo options back.
+- **Exemptions, deliberate:** edit mode is untouched (chips, edit grid
+  and edit bar all stay — he's mid-task there); an open settings sheet
+  stays up and functional; the screensaver is unchanged (the rule
+  requires app mode). The Photos view never had a ✕ of its own —
+  leaving it is via the rail.
+- **Verified** in the local harness (fixture albums, app mode):
+  computed-display asserted for shown / hidden / restored in landscape,
+  hidden in portrait, plus both exemption states; console clean.
+  Deployed via the Mac PUT route; served md5 `647f1b44ca25ef7cf5fc0b04ddb80e02`
+  matches local. Undo: re-PUT the previous index.html from the
+  portal-dashboard repo.
+
 ## 2026-10-25 (evening, later) — Weather view partial-render fix; Photos rotate speed + single-photo pin
 
 - **Weather view rendered a partial forecast as if it were the whole thing.**
