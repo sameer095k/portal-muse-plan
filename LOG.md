@@ -155,8 +155,9 @@ Evening build session (design locked with Sameer in chat first, per the design-f
   path. **Fix: `pm enable` both → video works immediately** (his test call).
   Disabled count 12 → **10**. Undo: `pm disable-user` both (video calls in
   the sideloaded app break again).
-- Open decision (his): keep both on for video, or trim back and lose video.
-  The Phase 7 router firewall remains the network-side mitigation either way.
+- **DECISION (2026-10-25 evening, his): keep both services ENABLED** — video
+  wins over the fuller debloat. The Phase 7 router firewall remains the
+  planned network-side mitigation.
 
 ## 2026-10-25 (afternoon) — v2 dashboard BUILT: side rail + persistent view, Usuals, Photos, app-launch doors
 
