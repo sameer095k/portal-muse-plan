@@ -4,6 +4,12 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-26 (afternoon) — Built-in WhatsApp signed out; the real app is the only Portal WhatsApp now
+
+- Sameer saw two linked devices on his phone's WhatsApp and logged the **built-in** Portal client (linked during the Oct 24 takeover) out from iPhone → WhatsApp → Settings → Linked Devices. To tell them apart, Muse opened the sideloaded app on the Portal first so its entry showed active-now (the keeper); he removed the stale one.
+- The sideloaded app's companion link (Oct 25) is untouched and remains the Portal's WhatsApp. Portal-native WhatsApp calling via the Calls tile goes with the built-in account — already a dead end, no loss.
+- His stated preference, recorded: no historical-message sync needed on the Portal app (new messages only); full history stays on his phone. Nothing to configure — a companion only ever holds a bounded recent window from its link, and unlinking the built-in device never touched the phone's archive.
+
 ## 2026-10-26 (afternoon) — Photo rotation: split settings across faces fixed (DashServer 6.10)
 
 - **Sameer's report:** rotation ticked every ~10 s despite his 1-minute setting, flashing "No photos yet" and landing back on the same photo.
