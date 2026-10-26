@@ -4,6 +4,15 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-26 (morning) — AirPlay added: Wormhole Display installed (receiver live, iPhone test pending)
+
+- **Sameer's call:** "Remember we were gonna try to add airplay" → "Install Wormhole Display now." This is the RESOURCES.md find (pgodlews/wormhole-display, an Android port of UxPlay) finally tried — it makes the Portal an AirPlay receiver for iPhone/iPad/Mac: Screen Mirroring with sound, plus audio-only AirPlay speaker.
+- **Fit check first:** our regular Gen 2 (WD50JM) is NOT in the app's tested table (Portal+ Gen 2 / Mini / Go / TV), but the device reports `arm64-v8a` in its ABI list and the APK is arm64-only, targetSdk 29 — install took cleanly, no refusal. Release APK v0.3.0 (23,944,215 B) downloaded from GitHub Releases; sha256 matched the release's own checksum file (`beb18923…`). Local copy archived at portal-dashboard/apks/wormhole-display-0.3.0.apk.
+- **Install:** `adb install -r` over wireless ADB (Tailscale forwarder) — Success; package `io.github.pgodlews.wormhole`, firstInstallTime 2026-10-26 10:02.
+- **Setup done from here:** launched the dashboard once (status "Ready to Connect"), granted Auto-open via `appops set io.github.pgodlews.wormhole SYSTEM_ALERT_WINDOW allow` — the dashboard now reads Auto-open **Enabled**. Defaults left as shipped: Run in Background ON, Start on Boot ON, Speaker Output ON, orientation Landscape. Advertised Bonjour name: **"Wormhole Display"**. Receiver process is running in the background with the AirPlay port (7000) listening; dashboard returned to the front afterward — receiving doesn't need the app open.
+- **Pending Sameer's iPhone:** Control Center → Screen Mirroring → "Wormhole Display" — first real mirror (and a FaceTime-call mirror, the Phase 8 fallback) is his test; discovery from this side can't be proven without a sender. DRM'd apps (Netflix etc.) won't mirror — that's Apple's restriction, expected.
+- **Undo:** `adb uninstall io.github.pgodlews.wormhole` — ordinary app, nothing else touched.
+
 ## 2026-10-26 (morning) — Show page: pushed content gets a full dashboard view (page-only)
 
 - **Sameer's ask:** the pancake card worked, but the recipe had to scroll inside the little pop-up — "make it like a page instead of just a pop up, so you have more real estate."
