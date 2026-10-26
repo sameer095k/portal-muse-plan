@@ -4,6 +4,60 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-25 (night) — Calendar events tappable: detail sheet, Family edit/delete
+
+- **Tap any event** — landscape grid block, all-day chip, or portrait day
+  row — and a detail sheet opens (the add form's overlay-card language):
+  title, When, Where (when present), Calendar (when the data names one).
+  **Family events get Edit + Delete**; snapshot events are view-only —
+  no controls, by their absence; queued events get Remove (the existing
+  `/api/calendar/dequeue`).
+- **DashServer 6.4** (versionCode 14, same cert; after `install -r` the
+  service needed one MainActivity relaunch to bring port 8321 back, as
+  with 6.3): the calendar read now carries **`gid`** — the Google event
+  id — on Family-calendar events only, plus `cal` (source calendar
+  name); `build_data.py` writes `cal` into calweeks too. New endpoints
+  **POST /api/calendar/update** and **POST /api/calendar/delete**; the
+  Google path hard-codes the Family calendar id, so an id minted by
+  any other calendar simply does not resolve there. Update is a PATCH
+  (GoogleClient rides a POST + `X-HTTP-Method-Override: PATCH` —
+  HttpURLConnection has no PATCH) touching summary/start/end only, so
+  an event's location and description survive an edit; a multi-day
+  all-day event keeps its span when edited. Delete arms in place —
+  first tap turns the button to "Tap again to delete", second fires.
+  A failed save/delete keeps the sheet open with the failure on it.
+- **Merge precedence** (was implicit, now explicit): live → snapshot →
+  queue, first copy of an instant wins, so the rendered copy of a
+  Family event is always the live one carrying its id. After an edit
+  or delete the page tombstones the pre-mutation key in localStorage
+  (48 h) and filters snapshot copies against it — a stale snapshot
+  twin can't resurrect the old time, or the deleted event, before the
+  next snapshot build lands.
+- **Proven live** on the real Family calendar: throwaway event added
+  via the existing add path (Google id `sup782o9hs11j6gvrq1ge60sl0`,
+  Oct 27 9:00–9:30 AM PT), moved to 10:00–10:30 and retitled via
+  /api/calendar/update, read back independently via gws at
+  17:00–17:30Z with the new title, deleted via /api/calendar/delete,
+  gws confirms the day empty. Queue `[]` throughout; /api/grocery,
+  /api/photos, /api/usuals, /api/agenda all 200 after the install.
+  The Dec 18–21 read now returns all 5 Family events with gid —
+  the wedding weekend is editable from the couch.
+- **Also approved and built (separate items):** queued-event
+  visibility — a queued add must never masquerade as a saved event:
+  dashed gold outline on grid blocks/chips and portrait rows, a
+  "Queued" tag in portrait rows, and a Status: Queued line in the
+  detail sheet. Live and snapshot events carry no marker. (The
+  landscape blocks keep just the outline — the tag text clipped at
+  column width.)
+- **Also approved and built (separate items):** the last emoji rail
+  buttons (Home ⌂, Prayer ☪, Weather ☀, All apps ▦) are now inline
+  SVG line icons in the calendar/photos/grocery style; only Chrome ◎
+  and the rail «/» remain glyphs. A proposed home-screen "updated"
+  timestamp was **declined** by Sameer — not built.
+- Undo: page → re-PUT the previous index.html from git history;
+  server → reinstall the previous APK (6.3 source is the prior
+  portal-dashboard commit). The live test event left no residue.
+
 ## 2026-10-25 (night) — Grocery: line-icon rail button + stale-while-revalidate, no loading state
 
 - **Rail icon:** the grocery button's 🛒 emoji is now an inline SVG
