@@ -4,6 +4,103 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-25 (night) — Everything on-device: DashServer 6.5, snapshot retired (Phases 1 + 2)
+
+- **Sameer's directives:** "No let's move everything onto the portal
+  itself not this snapshot stuff." Then, Phase 2: "The family calendar
+  is the only one i care to share and i already did." — no new calendar
+  sharing; Family stays the only calendar the service account can read,
+  and the VM snapshot is fully retired rather than kept for the other
+  calendars.
+- **DashServer 6.5 (versionCode 15), new class `OnDevice.java`:**
+  - `GET /api/prayer` — the Portal fetches isalaah (IOK + CHESS) itself;
+    parsing/shaping ported exactly from build_data.py (meridiem
+    inference, Sunrise row). Per-day on-device cache
+    (`prayer-cache.json` in the dashboard root); stale cache served on
+    fetch failure, 502 only when no cache exists at all.
+  - `GET /api/word` — the Portal fetches the Transparent Language Urdu
+    WOTD RSS itself (daily_word.py's parser ported; Urdu only, the
+    English line stays dead per his earlier call). Per-day cache
+    (`word-cache.json`).
+  - **Word audio is generated ON the Portal** with Android
+    TextToSpeech `synthesizeToFile` → `audio/wotd-ur.mp3`, lazily, with
+    a date stamp (`audio/wotd-ur.stamp`). Verdict: the engine exists
+    (`com.facebook.aloha.app.ttsservice`) and produced a real 6,188-byte
+    clip on-device. **Caveat:** Urdu is NOT a supported language in that
+    engine (availability −2, LANG_NOT_SUPPORTED), so the clip is spoken
+    in the engine's default voice — pronunciation is approximate.
+    Nothing was faked; the text path is exact.
+  - **Queue retry moved on-device:** `GET /api/calendar` now flushes
+    the on-device queue first (direct Family insert via PortalApi),
+    then reads — replacing build_data.py's host-side drain. Proven
+    live: a planted queued event was inserted by a single calendar
+    read (Google id `p218gm4sfc7s3o21seh5vs6ihs`), the queue file
+    returned to `[]`, and the test event was then deleted with zero
+    residue.
+- **Page rewrite (deployed md5 `7c38e432e020a556997375659cc821af`,
+  via the Tailscale PUT route):** the snapshot is GONE from the page —
+  grep-proof zero matches for `data.json|calweeks|loadSnap|SNAP|
+  calTombstone`. Prayer reads `/api/prayer`; the word card reads
+  `/api/word`; home agenda and grocery cards read the live endpoints;
+  weather persists the FULL Open-Meteo object to localStorage on every
+  successful fetch and falls back to that cache. All last-good caches
+  live on-device (`pr/wx/ag/hg/word_cache_v1`), stale-while-revalidate
+  style. Calendar merge is **live Family events + the on-device queue
+  only**; the snapshot merge and its tombstone machinery were removed.
+- **Prayer match evidence:** `/api/prayer` rows equal the last
+  snapshot's rows field-for-field — Fajr 5:56 AM (IOK 6:20 / CHESS
+  6:33), Sunrise 7:03, Dhuhr 12:36 PM (1:15 / 1:45), Asr 4:28 (4:45 /
+  4:45), Maghrib 6:07 (6:14 / 6:14), Isha 7:16 (8:00 / 7:45).
+  `/api/word` returned نیپکن ("napkin", noun) with example — identical
+  to an independent parse of the RSS.
+- **The rename proof:** with `data.json` temporarily renamed away on
+  the device (absence ls-confirmed), the home face rendered fully —
+  clock, weather "67° Clear H 81° · L 56°", the full prayer strip,
+  live agenda, the live grocery list (incl. Garlic), and the word band
+  with its play button. The file was restored afterward; it remains on
+  disk, unused.
+- **Latent bug found + fixed by this refactor:** the page sends
+  calendar `timeMin/timeMax` with fractional seconds
+  (`Date.toISOString()`); PortalApi's date parser rejected them, so
+  **every page-originated `/api/calendar` read had returned 502 since
+  6.4 shipped** — silently, because the snapshot merge covered the
+  week view. (The 6.4 live proofs used curl without millis.) Fixed
+  with a `parseRfc()` helper that strips fractional seconds; page-
+  format queries now return 200 with events. Side effect: the 6.4
+  event detail sheet now works from the page for the first time —
+  verified on-device by opening the Dec 19 Nikkah (Family, with
+  Edit + Delete present, location intact).
+- **Phase 2 consequence (his decision):** the retired snapshot's
+  calweeks carried 27 events — Family 15, US Holidays 7, primary
+  calendar 5. Those non-Family events no longer appear on the Portal:
+  Thanksgiving week now shows only the Family event ("Abeer off") —
+  Thanksgiving Day and Black Friday are gone from the Portal, as is
+  Halloween on Oct 31. The events themselves are untouched in Google;
+  they only ever reached the Portal via the snapshot, and the primary
+  calendar stays deliberately unshared.
+- **VM machinery retired:** crons `portal-dashboard-snapshot-push`
+  (30-min) and `portal-dashboard-daily-word` (daily) are DISABLED
+  (verified `enabled=false`, bodies preserved). `build_data.py`,
+  `push_snapshot.py`, and `daily_word.py` remain in the
+  portal-dashboard repo but are no longer part of any live path.
+  Nothing in the page reads data.json anymore — there are no remaining
+  snapshot dependencies.
+- **Verification:** local harness (stub server + headless Chrome,
+  fixtures = real device responses) — good scenario 10/10, forced-500
+  scenario 5/5 with all last-good caches surviving on screen, and zero
+  `data.json` requests in either run. (Harness note: Chrome 152's
+  Local Network Access checks block loopback navigations in the VM
+  sandbox, so the harness loads the page from file:// with a small
+  fetch-rewrite shim; page logic under test is byte-identical.)
+  Regression smoke after deploy: prayer, word, agenda, grocery,
+  usuals, and calendar endpoints all 200.
+- **Commits:** portal-dashboard `820966f` (page + DashServer 6.5
+  sources; the upload token stays redacted in the committed
+  DashService.java, as before). This LOG entry in portal-muse-plan.
+- **Undo:** re-enable the two crons and PUT the previous page
+  (md5 `3dd1f86fcad6af539aa60ef06d5ee013`, in git history) and reinstall
+  the 6.4 APK; the on-device data.json was never deleted.
+
 ## 2026-10-25 (night) — Tailscale installed on the Portal (not signed in)
 
 - **Sameer's ask:** "Sideload the app for now" — install only. The
