@@ -4,6 +4,33 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-25 (night) — Tailscale installed on the Portal (not signed in)
+
+- **Sameer's ask:** "Sideload the app for now" — install only. The
+  sign-in stays his on-device step, and the VM's tailnet join approval
+  is still outstanding, so the snapshot PUSH pipe remains unarmed
+  (`push_snapshot.py` still no-ops without portal-push.json).
+- **APK, official source only:** `tailscale-android-universal-1.104.2.apk`
+  from https://pkgs.tailscale.com/stable/ (the only Android APK in the
+  stable track listing). 105,587,943 bytes, md5
+  `c4ef8f5b8072c96432ce81309df280f8`. Package verified from the APK
+  itself before installing (aapt on the Mac): `com.tailscale.ipn`,
+  versionName `1.104.2-tc3430f0d2-gb01fa89d5`, minSdk 26.
+- **Transfer:** the proxy truncates single-shot sends at ~224 KB, so
+  the APK crossed VM → Mac in 196,608-byte chunks with per-chunk size
+  verification (538 chunks; truncated chunks retried); reassembled on
+  the Mac and md5-matched byte-exact before install.
+- **Install:** `adb install ~/tailscale-1.104.2.apk` over the USB
+  bridge → Success. Verified on-device: `pm list packages` shows
+  `com.tailscale.ipn`; dumpsys confirms the versionName above. The
+  app was **not launched** (no pid), not signed in, not configured;
+  nothing else on the device was touched.
+- **Undo:** `adb uninstall com.tailscale.ipn`.
+- **What's left (unchanged from the Oct 24 plan):** Sameer signs in
+  on the Portal; approves the VM's tailnet join; the first connection
+  to the Portal's tailnet address is approved; then portal-push.json
+  gets written and one push is watched landing.
+
 ## 2026-10-25 (night) — Calendar events tappable: detail sheet, Family edit/delete
 
 - **Tap any event** — landscape grid block, all-day chip, or portrait day
