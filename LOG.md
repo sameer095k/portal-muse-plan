@@ -4,6 +4,15 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-26 (morning) — Show page: pushed content gets a full dashboard view (page-only)
+
+- **Sameer's ask:** the pancake card worked, but the recipe had to scroll inside the little pop-up — "make it like a page instead of just a pop up, so you have more real estate."
+- **What:** the pop-up overlay is gone; pushed content is now a proper dashboard view (`shview`, in the view map alongside Prayer/Weather/Groceries). Header: title + subtitle, gold Open (when a URL rides along), Done ✕. Sections render as full-height side-by-side columns (first column narrower — Ingredients beside Steps); the thumbnail is a wide banner under the header for rich content and a large hero for link-only content. Portrait stacks the columns. **Page-only change — no DashServer/APK change:** the /api/show payload and endpoints are untouched.
+- **Behaviour carried over, adapted:** a NEW card still switches both faces to the Show page (the screensaver face included — a ui-state sync guard keeps a stale posted view from pulling the dream face off Show while a card stands). Open hands the link to Chrome via portal://open and the page simply stays underneath, so returning lands on it again — the v2 opened-id/reshow machinery is retired. Done ✕ clears server-side and returns Home. If he navigates away mid-card, a rail Show button (play-screen glyph) is visible only while a card stands and brings the page back; it disappears when the card is cleared.
+- **Deploy:** page PUT via the Tailscale route; served md5 == local (`ccc5010b…`). Dashboard cold-started once over wireless ADB (page updates land on a cold start).
+- **Verified on-device (adb taps, screenshots kept):** the standing pancake card rendered full-page after cold start — all 8 ingredients + all 6 steps on screen at once, zero scrolling. Tap Open → Chrome resumed; card still held server-side (same id); returning to the dashboard landed back on the Show page. Tap Done ✕ → `/api/show` = {"id":null}, back on Home, rail Show button gone. Re-posted the pancake recipe — the dashboard auto-switched from Home to the Show page on the new card, which is the state left standing for Sameer.
+- **Undo:** restore the previous index.html (the 6.7 page) via the same PUT route; server and payloads are unchanged, so v2 cards render exactly as before.
+
 ## 2026-10-25 (late night) — Show cards v2: Open can't lose the card + recipes on the card (DashServer 6.7)
 
 - **Why:** Sameer's first live tap on the pancake card: Open cleared the card server-side in the same tap whose Chrome launch got swallowed (dream-exit transition) — card gone, nothing opened. His ask on top: "more info than just the video link, like the recipe listed steps ingredients and then link if i wanted."
