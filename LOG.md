@@ -4,6 +4,58 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-25 (evening, later) — Weather view partial-render fix; Photos rotate speed + single-photo pin
+
+- **Weather view rendered a partial forecast as if it were the whole thing.**
+  Sameer's photo of the Portal in landscape: current temp + H/L and the
+  radar rendered, but the Hourly and 10-Day cards were empty and the
+  detail tiles (feels-like / UV / wind / humidity) never appeared.
+  Root cause: the snapshot's weather object is home-face-only by design —
+  `now_f / label / hi / lo`, no hours/days — and every section of the
+  view render is guarded, so a partial object produced silently blank
+  cards instead of an error. The view only ever looked right when the
+  live Open-Meteo fetch landed first.
+- **Fix (index.html + build_data.py):** `wxFull()` shape gate — the view
+  renders a forecast only when hours AND days are present; a partial
+  object gets a one-line status in the view instead (loading, or
+  unavailable after a failed fetch), and the view re-renders itself when
+  the live fetch lands. `build_data.py` now writes the FULL weather
+  object into the snapshot (same Open-Meteo transform the page runs),
+  so even the fallback render is complete. **Learning: a fallback cache
+  must carry the full shape the renderer expects, or be shape-checked
+  before render — guarded rendering turns missing data into a silent
+  blank.**
+- **Photos settings (his ask):** a ⚙ gear at the right end of the photo
+  bar opens a settings sheet inside the Photos view. **Rotate chips —
+  10s · 30s · 1 min · 5 min · Off** — replacing the hard-coded 30 s
+  timer; persisted in localStorage (`ph_rotate_ms`, default 30s), and a
+  tap re-arms the timer on the spot. Off stops the timer entirely:
+  photos then change only by hand or album switch, and the library
+  still refreshes on view open. The tick still calls loadPhotos(), so
+  new photos keep arriving at any speed.
+- **Show only this (the pin):** a "Show only this" button in the photo
+  bar pins the displayed photo — its path, `?v=` stamp stripped — in
+  localStorage (`ph_pin`). The pin gates only the AUTOMATIC advance:
+  the timer path (`stepPhoto(d, auto)`) snaps back to the pinned photo
+  every tick, while manual Prev/Next browsing is never gated. One photo
+  state machine drives both faces (the screensaver restores the same
+  view + album via ui-state), so the pin holds on the screensaver too.
+  The settings sheet shows the pinned photo (thumbnail + file name)
+  with a **Clear** button; the bar button turns gold while the pinned
+  photo is on screen. If the pinned file disappears from the library,
+  the next /api/photos load clears the pin by itself.
+- Verified locally before deploy (stubbed /api/photos, fixture albums):
+  timer armed at the default and re-armed per chip, Off leaves no
+  timer, pin set → auto-step returns to it → manual step leaves it →
+  auto-step returns, pin auto-clears when its file vanishes; panel
+  screenshotted in both orientations. Deployed by the Mac PUT route;
+  served md5 matched the local file (`5e1acbcb`). Page + build_data.py
+  committed to portal-dashboard as `dc849e1`.
+- Undo: re-PUT the previous index.html from the portal-dashboard repo's
+  history. The settings themselves live in the Portal browser's
+  localStorage — clearing site data resets rotate to 30s and drops the
+  pin.
+
 ## 2026-10-25 (evening) — Calendar week view + add-from-screen, multi-album photos, groceries portrait fix
 
 Evening build session (design locked with Sameer in chat first, per the design-first rule), shipped as **DashServer 6.1 → 6.2 + page updates**, all verified live on-device or against Google directly:
