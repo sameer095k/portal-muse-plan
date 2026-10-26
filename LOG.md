@@ -4,6 +4,81 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-25 (late night) — Hey Muse background wake diagnosed; wireless ADB enabled
+
+- **His report:** "Hey muse activation from dashboard doesnt work" —
+  then the A/B that cracked it: it "basically only works when i click
+  into the muse app."
+- **What was actually wrong (evidence, not vibes):** MuseService was
+  never dead — `dumpsys activity services` showed it foreground with
+  its notification the whole session, process alive since the
+  takeover. The failure is in the audio layer: `dumpsys audio`
+  showed the wake listener's record (VOICE_RECOGNITION, session
+  10097) as **`silenced:true`** whenever the Muse app wasn't the
+  resumed app, and `MuseWake` logged the loop for hours (from
+  18:53): "mic peak 0 over 60 s" → "the mic has read exact silence
+  for 64 s; reopening it" → Listening, forever. Bringing MainActivity
+  to the front flipped the *same* record to `silenced:false` within
+  seconds; returning to the dashboard left it heard — until the next
+  silence-triggered reopen, whose new record started `silenced:true`
+  again (proven twice, riids 10351/10367). Root cause: MuseService
+  declares **no `foregroundServiceType="microphone"`** (manifest
+  service element is name+exported only; targetSdk 28) and calls the
+  2-arg `startForeground`. On this Android 10-based Portal OS a
+  generic foreground service does not qualify for background mic —
+  records created while another app is in front start silenced, so
+  the app's reopen-in-the-background workaround (WakeListener.kt's
+  own comment expects a reopened mic to be heard) produces another
+  silenced record on this build. A quiet room (>64 s of digital
+  silence) is enough to fall into the trap; from then on it can
+  never hear anything until the app is fronted once.
+- **Ruled out / no-ops:** battery and standby — the service never
+  died, `am get-inactive` was already false. Added anyway as
+  prevention, all reversible: `cmd deviceidle whitelist
+  +dev.wobsoriano.museportal`, `cmd appops set dev.wobsoriano.museportal
+  RUN_IN_BACKGROUND allow` and `RUN_ANY_IN_BACKGROUND allow` (undo:
+  same commands with `-` / `default`). Proven not to affect
+  silencing: the record created right after still started silenced.
+  UID `RECORD_AUDIO` appop was already `allow`; re-setting it
+  changed nothing.
+- **Durable fix (not built):** fork patch — manifest
+  `android:foregroundServiceType="microphone"` on MuseService +
+  the 3-arg `startForeground(id, notification,
+  FOREGROUND_SERVICE_TYPE_MICROPHONE)` on API 29+. Small code
+  change, but the toolchain exists on neither machine right now:
+  the Mac has JDK 8/11 only and an old SDK; the VM has no Java at
+  all. Project notes call for JDK 21 + Android SDK 35 — that's a
+  setup step before any build; not started.
+- **Interim state left on the device:** one app-front cycle
+  (MainActivity front ~6 s, then DashServer front) so the current
+  record (session 10145) sits `silenced:false` with the dashboard in
+  front and MuseService foreground; `logcat -c` run last so the
+  A/B window is clean. This lasts until the next silence-triggered
+  reopen — if a wake attempt fails, fronting the Muse app once and
+  returning to the dashboard re-arms it the same way.
+- **Wireless ADB enabled (Sameer approved: "Yes, leave wireless ADB
+  on"):** over USB, `/Users/User/platform-tools/adb tcpip 5555`
+  (bare `adb` is not on the Mac's SSH PATH — full path always).
+  Verified from the Mac: `adb connect 192.168.1.117:5555` (LAN) and
+  `adb connect 100.115.140.112:5555` (tailnet) both list the device
+  and answer `shell echo ok`. MuseService state re-verified after
+  the adbd restart (foreground; see the reopen note above).
+  **VM side (Mac-free route):** official platform-tools at
+  `~/workspace/platform-tools/` + forwarder
+  `~/workspace/tools/adb-tailscale-forward.py` (listens on
+  127.0.0.1:15555, CONNECTs to the Portal's tailnet address :5555
+  through the runtime tunnel proxy on port 3130; start it with
+  nohup before VM adb use, then `adb connect 127.0.0.1:15555`).
+  First VM connect reached the Portal and the device shows
+  `unauthorized` — the VM's RSA key still needs Sameer's "Allow"
+  tap on the Portal (with "always allow"). **Persistence:**
+  `service.adb.tcp.port` reads 5555, `persist.adb.tcp.port` is
+  empty — expect wireless ADB to need re-enabling after a Portal
+  reboot (one USB moment). **Undo:** `adb usb` while USB-attached,
+  or reboot the Portal. Exposure note: adbd is now reachable on the
+  LAN and the tailnet; the RSA key trust still gates shell access —
+  only the Mac's key is authorized so far.
+
 ## 2026-10-25 (night) — Everything on-device: DashServer 6.5, snapshot retired (Phases 1 + 2)
 
 - **Sameer's directives:** "No let's move everything onto the portal
