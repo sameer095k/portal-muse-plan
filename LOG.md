@@ -4,6 +4,15 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-25 (late night) — Screen pop-up: Muse can throw a card on the dashboard (DashServer 6.6)
+
+- **Sameer's go:** asked for a pancake recipe by voice, got voice-only back, and approved "Build the screen pop-up" — something visual should land on the screen, not just be spoken.
+- **What:** DashServer 6.6 (versionCode 16) adds `POST /api/show` (Bearer-token-gated like the uploads; body {title, subtitle?, url, image?} → stored as show.json in the served dir, server-stamped id/created, each POST replaces the card), `GET /api/show` (current card or {"id":null}), and `POST /api/show/clear` (page-side, no token — same trust as the other local /api calls). MainActivity gains a `portal://open?url=<urlencoded>` intercept → ACTION_VIEW targeted at Chrome (org.chromium.chrome), default browser as fallback. The page polls /api/show every 5 s, tracks the card id, and renders a centered overlay (16:9 thumbnail, title, subtitle, gold Open button, ✕) in the existing theme vars, in BOTH faces — visible on the screensaver, tappable in the app; Open and ✕ both clear server-side, so a dismissed card never returns, and a card still up after a page reload shows again.
+- **CLI:** `show_on_portal.py` in portal-dashboard (committed) — `--title/--url/--subtitle/--image` posts via the Tailscale proxy route reading portal-push.json + .dash-token; `--clear` clears.
+- **Build route:** VM-only (Sameer unplugged the MacBook): JDK 21 + SDK build-tools 35 on the VM (javac → D8 → aapt2 → zipalign → jarsigner), same Android debug cert (SHA1 9F:10:DE…B5:FA:CA:3A) as every DashServer build. Installed with `adb install -r` over wireless ADB; MainActivity relaunched to bring port 8321 back. Page deployed by the Tailscale PUT route; served md5 == local md5 (`f6332b56…`).
+- **Verified on-device:** /api/prayer + /api/grocery still 200; POST /api/show without the token → 401, bad payload → 400. End-to-end with a test card (a real YouTube pancake video + its hqdefault thumbnail): card rendered over the dashboard (screenshot), adb tap on Open → Chrome resumed on the exact watch URL and the card auto-cleared (GET /api/show = {"id":null}); back on the dashboard, final screenshot clean — no test card left up. One wrinkle: a warm `am start` resume did NOT pick up the newly deployed page (the WebView kept its old copy); a force-stop + relaunch did — page updates land on a cold start of the app/dream.
+- **Undo:** reinstall the 6.5 APK and/or restore the previous index.html; the endpoints are additive and no existing behavior changed.
+
 ## 2026-10-25 (night) — Hey Muse permanent fix: mic priming (built, installed, verified)
 
 - **Sameer's go:** "Build the permanent fix", after the diagnosis in the entry below.
