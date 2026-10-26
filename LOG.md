@@ -4,6 +4,44 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-25 (night) — Grocery: line-icon rail button + stale-while-revalidate, no loading state
+
+- **Rail icon:** the grocery button's 🛒 emoji is now an inline SVG
+  shopping-cart outline in the same line-icon style as the calendar
+  and photos buttons (24×24, stroke currentColor, 1.7 width) — it
+  takes the rail's soft/accent tints like its neighbors.
+- **No more loading feel (his ask):** the grocery view used to sit
+  blank until the live sheet read landed. It now opens instantly on
+  the last fetched list + usuals, cached in localStorage
+  (`gr_cache_v1`) on every successful fetch, and refreshes silently
+  in the background; fresh data swaps in when it arrives. A failed
+  refresh changes nothing on screen — no error, no blanking. Every
+  mutation already re-fetches, so the cache always reflects the
+  latest known state. The data.json snapshot still seeds the very
+  first open when no cache exists yet.
+- **Check-off semantics changed (his call: "it should just clear
+  value basically means we got it that's it"):** check-off = clear
+  the cell; the green-toggle is retired. A tap on an item now calls
+  POST /api/grocery/checkoff, and DashServer clears the item's cell
+  on the sheet — value and any fill — so the item simply leaves the
+  list. The read no longer computes a "bought" flag, the calibrated-
+  green machinery and the page's bought styling/toggle path are all
+  deleted, and there is no un-check because there is no marked state
+  to restore. DashServer 6.3 (versionCode 13), built via the Mac
+  flow, same signing cert, `adb install -r`.
+- **Live-sheet proof:** a throwaway item was added via the API,
+  painted with the old green fill via gws, then checked off from
+  the API. Read-back: the cell's value is gone and its background is
+  plain {1,1,1} — no green. The sheet was left exactly as found.
+- **Photos, small:** the photo bar's pin button is now a two-state
+  toggle — "Show only this" with no pin, "Shuffle" while a pin is
+  active (tap clears the pin and rotation resumes at the current
+  speed). The label is set in refreshPinBtn, so the settings-sheet
+  Clear and the pinned-file-gone auto-clear flip it too.
+- Page deployed via the Mac PUT route, served md5
+  f5de14b60ad8d20f60956d1a1fdcd032 = local. Undo: re-PUT the previous
+  index.html from git; DashServer undo: reinstall the 6.2 APK.
+
 ## 2026-10-25 (night) — Photos immersive: drawer hidden = photo options hidden
 
 - **His ask:** "hide all the photo options if we hide the drawer on that
