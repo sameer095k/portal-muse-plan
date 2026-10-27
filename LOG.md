@@ -4,6 +4,30 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-26 (evening) — Overlay close button unreachable in portrait (portal-muse v7)
+
+- **Sameer's report:** while Muse is talking, the popup's \u2715 shows in horizontal orientation but not vertical \u2014 no way to shut Muse up in portrait.
+- **Cause:** the overlay card was a fixed **880dp wide** and its window was sized (880+32)dp, centered. The portrait screen is 800px wide, so the window overflowed both sides and the \u2715 (last in the row, after avatar + text) sat off the right edge. Landscape (1280px) fit, which is why it only failed in portrait.
+- **Fix (OverlayBar.kt):** the window is now `MATCH_PARENT` wide and the card caps itself with `fillMaxWidth().widthIn(max = 880.dp)` inside a centered Box \u2014 portrait shrinks the card to the screen minus padding, landscape renders identically, and a mid-conversation rotation re-lays out. Built on the Mac (Gradle assembleDebug, BUILD SUCCESSFUL), installed `-r` over wireless ADB: Success, `firstInstallTime=2026-10-24 22:34:34` preserved (pairing/data untouched), same debug signer. APK archived `app-debug-patched-v7.apk` (md5 42146aa8de88c8784df9d244d7399169) in the fork clone.
+- **Commits:** fork local `19f592d` \u2192 GitHub sameer095k/portal-muse main `49e349a2` (tree verified).
+- **Not yet proven:** the \u2715 itself in portrait \u2014 that needs a live voice turn in portrait (Sameer's next "Hey Muse" with the Portal vertical). The geometry that hid it is removed by construction; his tap is the confirmation.
+- **Undo:** reinstall `app-debug-patched-v6.apk`.
+
+## 2026-10-26 (evening) — DashServer 6.12: show-card Open sends YouTube links to SmartTube
+
+- **Sameer's call:** recipe cards' Open "should just open on YouTube now that we have it installed" \u2014 Open used to target Chrome for every link.
+- **Change (MainActivity.openExternal):** if the URL's host is youtu.be / *.youtube.com / youtube-nocookie.com, fire a VIEW intent packaged to **org.smarttube.stable** first; on any failure fall through to the existing chain (Chrome \u2192 any browser \u2192 chooser). Non-YouTube links unchanged.
+- **Verified:** build clean (vc 22 / 6.12, signer SHA-1 9f10de6f\u2026b5faca3a as always); installed -r, MainActivity relaunched, service back on :8321 (page HTTP 200); SmartTube's manifest on-device declares VIEW authorities for youtube.com / www.youtube.com / m.youtube.com, so the targeted intent resolves to it; the standing chili card (id 1793066272078) still in place and now opens via the new path. His tap on Open is the live proof.
+- **Commits:** APK archived `apks/dashserver-6.12.apk` (portal-dashboard `f88ccdf5`).
+- **Undo:** reinstall `apks/dashserver-6.11.apk`.
+
+## 2026-10-26 (morning, recorded late) — SmartTube, Aurora, Wormhole v2, home cleanup
+
+- **SmartTube stable 32.68** (yuliskov/SmartTube release 32.68s) installed over wireless ADB; archived `apks/smarttube-stable-32.68-arm64.apk`. Sameer signed into his YouTube account in it. **Lounge pairing completed ~11:12 AM:** SmartTube \u2192 Settings \u2192 Remote control \u2192 Add device, code entered on his iPhone (YouTube \u2192 Settings \u2192 Watch on TV); **he confirmed native casting works, full screen, 11:16 AM.** Pairing persists across reboots; the Portal never appears in YouTube's Cast list proper (no Play Services / Cast receiver \u2014 Lounge pairing is the route). Undo: uninstall org.smarttube.stable, or unlink in Remote control.
+- **Aurora Store:** 4.8.4 installed from the official F-Droid repo, then **crashed on his login** \u2014 logcat: `IllegalArgumentException: Key "com.playrix.township" was already used` in its rewritten Compose home feed (Play's editorial list returns Township twice). Downgraded to **4.7.5** (pre-Compose generation; archived `apks/aurora-store-4.7.5.apk`), wizard walked to the login screen. **Google sign-in then failed at AAS-token generation** \u2014 expected on a device with no Google framework (by design here); retries can't fix it. **Anonymous is the only route; his tap on it is still pending.** Undo: uninstall com.aurora.store.
+- **Wormhole Display / MicPrime v2 ("v6"):** the v1 stand-down patch failed his re-test (streams still cut ~30s in; its 30s UsageStats window never fired). v2 widened the stats window to 900,000 ms and added an AudioManager.isMusicActive gate; built, the new log string verified inside the dex, installed in place (firstInstallTime preserved), archived `app-debug-patched-v6.apk`; fork local `65feb1a` \u2192 remote `b0eda002`. **His re-test of v2 has not happened \u2014 do not call the AirPlay fix done.**
+- **Immortal home screen consolidated:** 8 scattered pages compacted to **one page, 15 tiles** using Immortal's own manage UI (pencil \u2192 grid \u2192 \u2713); nothing removed. Future installs may strand a new page again; same trick re-applies it.
+
 ## 2026-10-26 (afternoon) — Photo shuffle order (DashServer 6.11)
 
 - **Sameer's ask:** the carousel walked photos sequentially; he wanted it to shuffle randomly through the selected album.
