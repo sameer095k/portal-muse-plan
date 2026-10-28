@@ -4,6 +4,12 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-28 (12:08) — portal-muse v12 SHIPPED: VOICE_COMMUNICATION is the standing mic source
+
+- **Changes:** sweep rotation removed; every mic open uses the fixed chain VOICE_COMMUNICATION → CAMCORDER → MIC (new WakeMicSource.kt replaces SourceSweep.kt); ask-phase Microphone.kt order swapped to the same chain; per-source peak logging kept; v10 SilenceRecovery untouched (its backstop reopens now just reopen the same source). Tests: WakeMicSourceTest replaces SourceSweepTest; Mac build all-green; signer = v11's; archived app-debug-patched-v12.apk. Local commit 9b4df064; remote per-file commits 7bac84e7 / a9417c04 / bd3d2c8c / 497b27c6 + deletions 1a0c0686 / 4fe12f5f.
+- **Install + restart done right this time:** installed 11:41–42 (firstInstallTime unchanged), WAKE-broadcast restart immediately after — pid 12794, model loaded 11:42:20, opened VOICE_COMMUNICATION 11:42:30, Listening. Still running at 12:08.
+- **Verification (25 min, untouched):** 4 opens, all VOICE_COMMUNICATION, no fallbacks, no rotation. Peaks: 7, nine 0s, 17, nine 0s, 14, then 0s — the non-zero minutes cluster right after each reopen. Honest caveat (builder's, endorsed): the house was empty/quiet, so the zero runs can't be distinguished from a silent room and the blips could be open transients — this window does NOT independently re-confirm the sweep. The strong evidence remains the sweep itself (968 / 3,121 with real sound in the room, same latched state, vs absolute 0 on the gated paths). **Decisive proof = his spoken "Hey Muse" after a long idle** — which is the real-world use anyway.
+
 ## 2026-10-28 (11:37) — SWEEP VERDICT: VOICE_COMMUNICATION (and CAMCORDER) pass audio through the latched gate — the fix is found
 
 - Full rotation while LATCHED (peaks per minute, same room): VOICE_RECOGNITION = absolute 0 (hours of evidence). **VOICE_COMMUNICATION (opened 11:19:09): 15 → 968 → 3,121** — real audio (his SmartTube video) while latched. **UNPROCESSED (11:22:19): 0 for ten straight minutes** — gated like recognition. **CAMCORDER (opened 11:32:17): 408, 570** in its first two minutes (sounds of him leaving the Portal area), then quiet-room zeros — also passes. MIC not yet reached in the rotation; no longer needed for the verdict.
