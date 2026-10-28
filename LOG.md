@@ -4,6 +4,12 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-28 (13:37) — Visual countdown timer demoed on the Show page (his ask, after the audio-only timer)
+
+- His feedback on the proof ask: the spoken "done" gave no visible start — he asked for a visual countdown. Delivered same-minute with existing machinery: a one-shot animated GIF (gold numerals 10→0, 1 s frames + a 3 s "Time's up" hold, PIL-generated, `portal-dashboard/make_timer_gif.py`) pushed to the served root via **adb push** (the DashServer PUT allowlist has no gif slot) and shown as a Show-card image (`http://127.0.0.1:8321/timer10.gif`; served as octet-stream, WebView sniffs and animates it fine).
+- Verified by screencap mid-run: full Show page, giant gold **7** on black (screenshot: portal-dashboard/timer-visual-check.png). A "⏰ Time's up" card followed; the Portal was back on Home by the final check (he likely tapped Done himself — the full loop working). Card cleared; nothing standing.
+- Limits of the trick: duration is baked into the GIF, and the start is bounded by the 5 s show poll. A native timer mode in the page (card carries seconds; page counts locally, auto-dismisses) would make any voice timer exact — offered, his call.
+
 ## 2026-10-28 (13:30) — ✅ FINAL PROOF: spoken "Hey Muse" fired after ~1 h 48 min untouched — the mic problem is SOLVED
 
 - The Portal sat untouched from the 11:42 v12 restart. Peaks read 0 through the empty-house stretch (ambiguous minutes), then from 13:24:33 — 663, 839, 1,111, 744, 629, 974 — he entered the kitchen and the VOICE_COMMUNICATION feed was plainly LIVE after ~100 min idle (the old recognition path would have been latched-dead in this state, permanently).
