@@ -4,6 +4,13 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-28 (11:37) — SWEEP VERDICT: VOICE_COMMUNICATION (and CAMCORDER) pass audio through the latched gate — the fix is found
+
+- Full rotation while LATCHED (peaks per minute, same room): VOICE_RECOGNITION = absolute 0 (hours of evidence). **VOICE_COMMUNICATION (opened 11:19:09): 15 → 968 → 3,121** — real audio (his SmartTube video) while latched. **UNPROCESSED (11:22:19): 0 for ten straight minutes** — gated like recognition. **CAMCORDER (opened 11:32:17): 408, 570** in its first two minutes (sounds of him leaving the Portal area), then quiet-room zeros — also passes. MIC not yet reached in the rotation; no longer needed for the verdict.
+- Mechanism makes sense: the OS gates the assistant-style recognition path on presence, but communication/camcorder capture must work from any state (calls, video recording) — so those paths stay open.
+- The sweep never logged "DELIVERS AUDIO" on VOICE_COMMUNICATION despite 3,121 peaks (the 3-s-continuous exit criterion is stricter than bursty real-world audio) — that's why the rotation moved on; harmless for the verdict, and in v12 the state machine matters far less because the feed simply stays live.
+- **v12 (dispatched):** WakeListener default source = VOICE_COMMUNICATION; Microphone.kt (ask-phase) tries VOICE_COMMUNICATION first; sweep rotation removed, per-source peak logging kept. Verification: WAKE-broadcast restart after install (the v11 lesson), then ~25 min untouched — peaks must stay live on VOICE_COMMUNICATION; a soft on-device chime self-test only if the empty-house readings are ambiguous. His spoken wake after long idle remains the final proof.
+
 ## 2026-10-28 (11:20) — portal-muse v11 source sweep installed; builder died before restarting the service — revived via WAKE broadcast; first sweep signal is faint but non-zero
 
 - **v11** (fork commit ada98c6 local; pushed — remote shows the sweep + SourceSweepTest commits): WakeListener's dead-phase reopens rotate the AudioRecord source VOICE_COMMUNICATION → UNPROCESSED → CAMCORDER → MIC → VOICE_RECOGNITION, logging "source sweep: opened <S>" and per-minute peaks tagged with the source; a source delivering 3 s of real audio logs "DELIVERS AUDIO" and exits the dead phase. Mac build all-green per the builder's trail; APK archived app-debug-patched-v11.apk; installed 10:28:19, firstInstallTime unchanged.
