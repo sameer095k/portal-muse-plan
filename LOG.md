@@ -4,6 +4,12 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-28 (09:32) — Always-awake test: the gate is Portal's presence-idle system, not the dream
+
+- **His pick:** always-awake (the energy delta is a wash — the screensaver is a lit slideshow, adaptive brightness runs the panel at 11/255, ~$1–2/yr) and the photo carousel survives regardless (it's the dashboard's own Photos view). Changes made 09:19: `screensaver_enabled` 1→0, `screen_off_timeout` 600000→2147483647, dashboard foregrounded. (`stay_on_while_plugged_in` put didn't stick — still 0; moot given the timeout.)
+- **Verification FAILED the hope:** peaks live 09:19–09:28 (71…808), then flat from ~09:28:27; zero dreams, device Awake throughout. At **09:28:52 aloha.UserPresenceManager logged "Availability idle since top app is not whitelisted"** — Portal OS idles the mic ~10 min after the last real interaction because DashServer isn't a Meta-whitelisted app. The 09:28:51 prime could not revive it (same as in dream). So the dream was a sibling symptom of the same ~10-min idle machine, not the cause; the 00:16 model is superseded again.
+- **Practical state:** Hey Muse is reliable within ~10 min of the Portal being touched/used; after long idle the first ask may need a tap. Backstop primes (every 10 min while dead) are the only flashes left. Untested: whether a whitelisted Meta app in front prevents the idle cut. His call: accept, or run that test.
+
 ## 2026-10-28 (00:16) — The mic cut is the DREAM state, not the foreground face (measurement verdict)
 
 - **The test:** 30 min on the Immortal faces (HOME at 23:45, logcat cleared). Peaks were LIVE every minute 23:46–23:55 (86…5,141), then **DreamManagerService logged "Entering dreamland" at 23:55:49.966** — and the feed flatlined within the minute (23:56:42 peak 10, then 0 through 00:15, one blip of 5). The 23:56 / 00:06 / 00:16 backstop primes did NOT revive it. Foreground samples at t+20/25/30: Immortal's PhotoFramePreviewActivity (the screensaver face) — the mic was dead with the screensaver in front, disproving the "DashServer app face" theory from the v10 entry (those dead stretches were idle-to-dream periods all along; Oct 25's pass was an active-setup session that never dreamed).
