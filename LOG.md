@@ -4,6 +4,12 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-28 (00:16) — The mic cut is the DREAM state, not the foreground face (measurement verdict)
+
+- **The test:** 30 min on the Immortal faces (HOME at 23:45, logcat cleared). Peaks were LIVE every minute 23:46–23:55 (86…5,141), then **DreamManagerService logged "Entering dreamland" at 23:55:49.966** — and the feed flatlined within the minute (23:56:42 peak 10, then 0 through 00:15, one blip of 5). The 23:56 / 00:06 / 00:16 backstop primes did NOT revive it. Foreground samples at t+20/25/30: Immortal's PhotoFramePreviewActivity (the screensaver face) — the mic was dead with the screensaver in front, disproving the "DashServer app face" theory from the v10 entry (those dead stretches were idle-to-dream periods all along; Oct 25's pass was an active-setup session that never dreamed).
+- **Corrected model:** Portal OS cuts the mic when the device enters the dream state. Awake — any face: grid, app, screensaver-not-yet — the mic lives (post-transition live stretches tonight: ~10 min each, matching the ~10-min idle-to-dream timeout). Primes cannot revive a dreaming device, and they visibly disturb the dream (PhotoFramePreview re-resumes at 00:06:01 / 00:16:01, right after the primes) — so in dream state the backstop is pure cost: a flicker every 10 min for zero benefit.
+- **The real choice (his, pending):** dream-on (pretty, low energy — Hey Muse only after the device is woken by touch) vs screensaver-off / always-awake dashboard (Hey Muse always live, zero primes, screen on 24/7). If dream-on wins, a small v11 gate should stop priming while dreaming (the UsageStats foreground shows the dream's activity, so it's detectable). A portal-muse-owned dream service is an unexplored longer shot — not promised.
+
 ## 2026-10-27 (night) — portal-muse v10: event-driven mic priming (the dashboard flashes)
 
 - **His report (21:23):** random flashes on the dashboard; he guessed the prayer repaint. Logcat said otherwise: the flashes are MicPrimeActivity launches (~130 ms, dashboard pauses/resumes around each). Tonight's cadence was bursts — every ~12.0 s for a minute-plus at 20:56, 21:02, 21:07, 21:21 (36 in the buffer) — vs the sparse settled behavior verified Oct 25. His criteria for the fix: least energy, looks best, Hey Muse still works. He picked Muse's proposed design (prime on evidence, not on a loop).
