@@ -4,6 +4,12 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-27 (evening) — Prayer highlight: current prayer holds until IOK iqamah + 10
+
+- **His ask (19:46):** on both the phone prayer widget and the Portal, keep the current prayer highlighted until IOK iqamah time + 10 minutes. Before this, both highlighted the NEXT prayer — the moment an azan hit, its card/row lost the highlight and dimmed.
+- **Portal (page-only, no APK change):** `index.html` tick() now computes CUR — the last prayer whose azan passed and whose IOK iqamah + 10 min has not (no-iqamah Sunrise gets azan + 10). The strip cards and the Prayer view rows highlight `CUR || next`; past-dimming excludes both the highlighted and the next card (wrap-around Fajr stays neutral). Countdown and azan firing remain next-based, untouched. Logic-tested 13/13 against the day's real times (Fajr 5:57/6:20, Maghrib 6:05/6:12, Isha 7:14/8:00…). Deployed by PUT (served md5 b4b3d6c2… = local), DashServer cold-started, and **live-verified by screenshot at 19:49: Isha ringed inside its window (holds until 20:10), Fajr neutral, earlier prayers dimmed** (qa/prayer-iqamah-window.png). Commit: portal-dashboard `71ce2af5`.
+- **Phone widget:** `prayer-widget.js` gains `currentPrayer()` with the same rule; the home-table bold row follows it, and `refreshAfterDate` now also fires ~1 min after the current window ends so the highlight hands off on time (previously only next-azan + 2 min). Syntax-checked, logic-tested 12/12; pushed to iok-prayer-widget `654e5898`. He still needs to refresh the script in Scriptable from the repo, as with past updates. NOT changed: the lock-screen widgets still feature the next prayer and flip at azan — flagged to him as a separate call.
+
 ## 2026-10-27 (evening) — portal-muse v9: banner auto-hide (the ✕ that ate the pancake card)
 
 - **His report (19:03):** the Muse reply banner stayed on screen over the pancake Show page; when he X'd the Muse message, the recipe disappeared too. Server check confirmed the card had been cleared (GET /api/show → `{"id":null}`); Muse re-posted it (with the video link + thumbnail — see the rule amendment in the entry below).
