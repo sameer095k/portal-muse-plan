@@ -4,6 +4,12 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-27 (evening) — Visual-first rule + unplug persistence + Show latency check
+
+- **Sameer's rule:** for a visual Portal ask, keep the spoken reply brief and just load the visual — he doesn't need to hear everything that's on the screen. Written into MEMORY.md, AGENTS.md, FEATURES.md (row 8) and the portal-dashboard README: full content goes to the Show page as soon as it's ready; voice says one brief confirmation; card content is read aloud only if he asks.
+- **Unplug answer (verified from the build):** the WD50JM has no battery, so unplugging turns it off — but nothing is lost. Apps, accounts and settings are on internal storage; DashServer stores its state as files (`ui-state.json`, `show.json`) in `/sdcard/portal-dashboard` and restarts via its BOOT_COMPLETED receiver; portal-muse restarts via its boot service with pairing/settings in app-private preferences; Immortal stays the default home/screensaver. The known exception is wireless ADB, which may need one USB `adb tcpip 5555` re-enable after a reboot — maintenance access only.
+- **Show latency, measured:** the push path itself is fast (GET /api/show through the Tailscale proxy round-tripped in ~0.47 s). The visible lag is the page's poll: `setInterval(pollShow, 5000)` in the dashboard page — a card can wait 0–5 s (average ~2.5 s) after it is already saved on the device before the page notices. Options, cheapest first: (1) poll every 1 s — cuts the average wait to ~0.5 s, page-only change, still needs a dashboard cold start to take effect; (2) true push (long-poll/SSE from DashServer) — near-instant, but an APK + page change to save under a second over option 1; (3) content-side: post the card before composing any spoken text (now the standing rule above) and skip/ shrink the remote thumbnail image, which the page only fetches after rendering. Awaiting his pick; nothing deployed.
+
 ## 2026-10-27 (evening) — Netflix + Disney+ apps sideloaded
 
 - **Sameer's ask:** load the Netflix and Disney+ APPS (not websites) onto the Portal.
