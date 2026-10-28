@@ -4,6 +4,16 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-27 (evening) — Netflix + Disney+ apps sideloaded
+
+- **Sameer's ask:** load the Netflix and Disney+ APPS (not websites) onto the Portal.
+- **Netflix 9.57.0 build 3 64089** (com.netflix.mediaclient, single universal APK 183,445,762 B from APKMirror, size matched the listing; aapt-verified): `adb install -r` Success. Launch lands on Netflix's own welcome screen (SignupNativeTabletActivity — "Unlimited movies, TV shows & more", SIGN IN / Get Started buttons); no crash, no Play Services complaint in logcat. No screenshot possible — Netflix windows are FLAG_SECURE; evidence is the UI-hierarchy dump `portal-dashboard/apks/qa/netflix-ui-dump.xml`. APK archived `portal-dashboard/apks/netflix-9.57.0.apk`.
+- **Disney+ 26.20.0+rc1-2026.10.22** (com.disney.disneyplus; current builds ship as bundles only — installed the genuine APKMirror splits via `adb install-multiple -r`: base + arm64/en/icu/density splits, 35,423,203 B bundle, aapt-verified): Success. Launch lands on the real welcome screen with live catalog artwork from Disney's backend (screenshot `portal-dashboard/apks/qa/disneyplus-launch.png`). Bundle archived `portal-dashboard/apks/disneyplus-26.20.0.apkm`.
+- **Route:** VM adb route (forwarder restarted, 127.0.0.1:15555) — the Mac route choked on the 183 MB transfer and APKMirror bot-walled the Mac's curl.
+- **Not proven:** actual playback (Widevine/HD certification) — only visible after he signs in; if a service refuses, it will say so at first play. Sign-in is his, on-device. Neither app was signed into.
+- **Home screen:** both apps installed but landed on a later launcher page (page 1 still shows the original 15 tiles) — home NOT reorganized.
+- **Undo:** `adb uninstall com.netflix.mediaclient` / `adb uninstall com.disney.disneyplus`.
+
 ## 2026-10-26 (evening) — Overlay close button unreachable in portrait (portal-muse v7)
 
 - **Sameer's report:** while Muse is talking, the popup's \u2715 shows in horizontal orientation but not vertical \u2014 no way to shut Muse up in portrait.
