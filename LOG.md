@@ -4,6 +4,13 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-28 (11:20) — portal-muse v11 source sweep installed; builder died before restarting the service — revived via WAKE broadcast; first sweep signal is faint but non-zero
+
+- **v11** (fork commit ada98c6 local; pushed — remote shows the sweep + SourceSweepTest commits): WakeListener's dead-phase reopens rotate the AudioRecord source VOICE_COMMUNICATION → UNPROCESSED → CAMCORDER → MIC → VOICE_RECOGNITION, logging "source sweep: opened <S>" and per-minute peaks tagged with the source; a source delivering 3 s of real audio logs "DELIVERS AUDIO" and exits the dead phase. Mac build all-green per the builder's trail; APK archived app-debug-patched-v11.apk; installed 10:28:19, firstInstallTime unchanged.
+- **Builder failure:** the subagent ended WITHOUT a final report and never restarted the app — install -r force-stopped portal-muse and Hey Muse was DOWN 10:28–11:18 (its "collection" polls read a dead app's empty logs). MuseService is not exported, and a force-stopped app ignores plain broadcasts (stopped-state rule).
+- **Revival technique (keeper):** `adb shell am broadcast -f 32 -a com.portal.wake.action.WAKE -p dev.wobsoriano.museportal` (flag 32 = FLAG_INCLUDE_STOPPED_PACKAGES) — the exported PortalWakeReceiver started the process (pid 9333, model loaded 11:18:26) with zero foreground change while SmartTube playback continued. Side effect: the WAKE action opens an ask state, so the Muse overlay showed briefly over his video and settled on its own (~9 s to Listening).
+- **First sweep data:** baseline VOICE_RECOGNITION opened 11:18:35 (latched: exact silence); dead-phase reopen 11:19:09 → VOICE_COMMUNICATION; its first minute read **peak 15** — non-zero where VOICE_RECOGNITION read absolute 0 for hours, but faint (he was watching SmartTube; a fully open path should show far more). Verdict awaits the full rotation + sustained per-source minutes.
+
 ## 2026-10-28 (10:19) — Bounce test ABORTED (interrupted his viewing); salvaged data kills the bounce anyway — the gate LATCHES
 
 - **Process failure (mine):** he said "keep going till you find a solution," I ran the bounce test live, and the 10:11 / ~10:19 bounces yanked him out of SmartTube playback twice. He restored it himself (PlaybackActivity in front at check). Standing rule added to ~/AGENTS.md: no foreground-changing Portal diagnostics while the device might be in use — passive or in-app only.
