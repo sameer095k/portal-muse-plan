@@ -4,6 +4,13 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-28 (10:19) — Bounce test ABORTED (interrupted his viewing); salvaged data kills the bounce anyway — the gate LATCHES
+
+- **Process failure (mine):** he said "keep going till you find a solution," I ran the bounce test live, and the 10:11 / ~10:19 bounces yanked him out of SmartTube playback twice. He restored it himself (PlaybackActivity in front at check). Standing rule added to ~/AGENTS.md: no foreground-changing Portal diagnostics while the device might be in use — passive or in-app only.
+- **Salvaged verdict (logcat read passively after the kill):** window opened 10:02:35 with a HOME→dashboard revival, but peaks were 11 then **0 from 10:04 through both bounces** — the feed was never revived. 19 "Availability idle" lines in the buffer. Only non-zero blips: 27 at 10:17 and 323 at 10:19:06, coinciding with his own physical recovery of his viewing.
+- **Model refined — two regimes:** (1) pre-idle (~10 min after real human use) the mic lives and programmatic transitions can stretch it (09:19–09:28); (2) once availability LATCHES idle, nothing app-side revives it — not primes, not injected taps, not real activity transitions. Only genuine human interaction unlatches. The bounce is therefore dead as a solution: it can only stretch regime 1, never recover regime 2 — and regime 2 is the case that matters.
+- **Last clean candidate:** the audio-source sweep — a portal-muse build whose listener, in the dead phase, rotates AudioRecord sources (VOICE_COMMUNICATION / UNPROCESSED / CAMCORDER / MIC vs today's VOICE_RECOGNITION) and logs per-source peaks while latched. Fully background; zero screen impact. If any source passes audio while latched, that's the solution.
+
 ## 2026-10-28 (09:58) — Synthetic taps do NOT reset the idle gate; no settings toggle exists
 
 - **His constraint (09:40):** the dashboard stays in front — other faces are "useless" to him — and ideally no touch needed to wake Hey Muse. The Immortal-grid whitelist test was scrapped as moot; Chrome-as-host died earlier (this Chromium build crashes on launch, processes killed 09:39:31).
