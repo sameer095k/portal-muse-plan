@@ -4,6 +4,13 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-28 (09:58) — Synthetic taps do NOT reset the idle gate; no settings toggle exists
+
+- **His constraint (09:40):** the dashboard stays in front — other faces are "useless" to him — and ideally no touch needed to wake Hey Muse. The Immortal-grid whitelist test was scrapped as moot; Chrome-as-host died earlier (this Chromium build crashes on launch, processes killed 09:39:31).
+- **Tap test (dashboard in front, adb `input tap 1260 780` at 09:45:46 / 09:49:48 / 09:53:48):** feed was live at window start (09:42 peak 6715), flat from ~09:43:30, and the taps neither revived nor sustained it; UserPresenceManager still logged "Availability idle since top app is not whitelisted" at 09:52:04; 2 primes in the window, no revival. Injected input is ignored by the gate (or availability keys only on genuine transitions) — synthetic keepalive is out.
+- **Settings probe:** no presence/availability/whitelist key in global/secure/system namespaces — no toggle to flip.
+- **Only proven reset:** genuine foreground transitions (real app switches / HOME). Remaining candidate: a periodic "bounce" (launcher for ~1 s, back to dashboard every ~9 min) — visible blip, untested, needs his OK because it flashes his screen. Otherwise the platform limit stands: Hey Muse live within ~10 min of real use; long-idle first ask needs one tap.
+
 ## 2026-10-28 (09:32) — Always-awake test: the gate is Portal's presence-idle system, not the dream
 
 - **His pick:** always-awake (the energy delta is a wash — the screensaver is a lit slideshow, adaptive brightness runs the panel at 11/255, ~$1–2/yr) and the photo carousel survives regardless (it's the dashboard's own Photos view). Changes made 09:19: `screensaver_enabled` 1→0, `screen_off_timeout` 600000→2147483647, dashboard foregrounded. (`stay_on_while_plugged_in` put didn't stick — still 0; moot given the timeout.)
