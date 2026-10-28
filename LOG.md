@@ -4,6 +4,12 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-28 (13:30) — ✅ FINAL PROOF: spoken "Hey Muse" fired after ~1 h 48 min untouched — the mic problem is SOLVED
+
+- The Portal sat untouched from the 11:42 v12 restart. Peaks read 0 through the empty-house stretch (ambiguous minutes), then from 13:24:33 — 663, 839, 1,111, 744, 629, 974 — he entered the kitchen and the VOICE_COMMUNICATION feed was plainly LIVE after ~100 min idle (the old recognition path would have been latched-dead in this state, permanently).
+- **13:30:37.151 — `MuseWake: wake: hey(1.0) muse(1.0)`**: full-confidence wake, no touch. The ask ("Can you start a timer for 10 seconds?") was recorded on the new ask-phase path, transcribed, and delivered as a Portal voice note.
+- End state, on his exact terms: dashboard in front, always-awake (screensaver off), Hey Muse always listening, no primes/flashes in normal operation (the feed never dies, so the v10 machinery never fires), no touch ever needed. The Oct 27–28 mic saga — flashes → priming policy (v10) → dream theory → presence-idle latch → source sweep (v11) → VOICE_COMMUNICATION (v12) — is closed.
+
 ## 2026-10-28 (12:08) — portal-muse v12 SHIPPED: VOICE_COMMUNICATION is the standing mic source
 
 - **Changes:** sweep rotation removed; every mic open uses the fixed chain VOICE_COMMUNICATION → CAMCORDER → MIC (new WakeMicSource.kt replaces SourceSweep.kt); ask-phase Microphone.kt order swapped to the same chain; per-source peak logging kept; v10 SilenceRecovery untouched (its backstop reopens now just reopen the same source). Tests: WakeMicSourceTest replaces SourceSweepTest; Mac build all-green; signer = v11's; archived app-debug-patched-v12.apk. Local commit 9b4df064; remote per-file commits 7bac84e7 / a9417c04 / bd3d2c8c / 497b27c6 + deletions 1a0c0686 / 4fe12f5f.
