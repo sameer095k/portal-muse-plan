@@ -4,6 +4,15 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-30 (15:52) — Calendar events wear their Google colors (DashServer 6.17 + page): soft tint, his pick
+
+- His ask (after sharing a calendar-component post on X): pull the colors from his Google Calendar into the Portal calendar app. Design shown first per his rule — he picked **tint** over a left stripe; filters (the post's other idea) explicitly declined.
+- DashServer 6.17 (vc 27), PortalApi `/api/calendar`: each event now carries `color` — the event's own `colorId` mapped through Google's fixed 11-color palette; otherwise the calendar's `backgroundColor` when the list entry exposes one. Direct-id fallback fetches (calendarList.get, then calendars.get, once per calendar per process) cover calendars riding as synthesized bare entries.
+- **Measured limit, not a bug:** the Family calendar's own color never reaches the service account — Family is not in the SA's calendarList (calendarList.get → 404) and calendars.get returns `backgroundColor` empty for the shared group calendar. So only per-event colors show: 6 of 19 events Nov 2026–May 2027 carry one (birthdays periwinkle #a4bdfc ×4, Dentist basil #51b749, Abeer wfh flamingo #ff887c); uncolored events keep the default gold tint. Fixing it would need the calendarList.insert scope the SA doesn't hold — not worth a re-consent for a tint.
+- Page: tint = color hex + `33` (~20% alpha) spliced into the existing style on landscape blocks (.cev), portrait rows (.cevrow) and all-day chips (.cad). Queued (not-yet-in-Google) events have no color and keep the default tint, so they stay visually distinct.
+- Verified: `/api/calendar` JSON carries the colors; on-device portrait screencap of Nov 15–21 shows Dentist (Tue 17th, 10:00 AM) in light green while uncolored rows stay gold. Landscape blocks use the identical tint splice (node syntax-checked) — the device was not rotated for a screenshot, per the rule against disturbing the display while it may be in use. ui-state restored to home afterwards.
+- Pushed: portal-dashboard `8ff90106` (index.html), `1e820925` (PortalApi.java), `7df4d743` (AndroidManifest.xml). Undo: reinstall the 6.15 APK from dashbuild history + restore index.html from git.
+
 ## 2026-10-28 (14:05) — Native dashboard Timer SHIPPED (DashServer 6.15 + page): ring, tap-to-start tiles, two-ring chime
 
 - Path: audio-only timer (13:30) → GIF countdown demo (13:37, "terrible ui/ux") → his ask for a native timer → design research (Nest Hub ring+digits+label, Time Timer shrinking disk, tap-to-start presets) → mock v2 approved with two edits: **no label**, and at 0:00 the alarm **must not keep ringing — two rings is enough**.
