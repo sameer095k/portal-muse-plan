@@ -4,6 +4,13 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-31 (12:27) — Photo-add asks "Add more?" after an upload (DashServer 6.18)
+
+- His two-part ask: does add-photo have a per-send limit, and after adding it should prompt whether to add more. Code answer on the limit: no count limit — the form takes multiple files and the server saves every part; the only cap is the whole request at 80 MB (Content-Length check in handlePhotoAdd), plus a 60 s socket timeout.
+- Change: the POST success page was a dead end ("Added N photos… close this tab"). It now shows "Added N photos / Add more?" with an **Add more** button (back to the picker) and **Done** (inline swap to the "All set" note). No new routes.
+- Verified end-to-end over adb port-forward: a real 2-photo multipart POST returned the new page (prompt + Done state present), both files landed (67 → 69), then the two test photos were deleted (back to 67) so the slideshow stays clean. Picker GET unchanged.
+- Pushed: portal-dashboard DashService.java + AndroidManifest.xml (6.18, vc 28). Undo: reinstall 6.17.
+
 ## 2026-10-30 (15:52) — Calendar events wear their Google colors (DashServer 6.17 + page): soft tint, his pick
 
 - His ask (after sharing a calendar-component post on X): pull the colors from his Google Calendar into the Portal calendar app. Design shown first per his rule — he picked **tint** over a left stripe; filters (the post's other idea) explicitly declined.
