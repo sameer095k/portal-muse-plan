@@ -4,6 +4,14 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-31 (12:47) — Remove from album SHIPPED (DashServer 6.20 + page)
+
+- Context: albums are copy-based since the multi-album change ("Add to" copies; delete is per-copy; /api/photos/move is unreferenced by the page — "we got rid of move"). He asked for a way to take a photo OUT of an album without deleting it.
+- Built: `POST /api/photos/unfile` + a **Remove from album** button in the photo edit bar (between Add to and Delete). Semantics: the photo leaves its album and survives in Main exactly once — if Main already holds the same bytes (md5), the album copy is deleted; if not, the file moves to Main; already-in-Main is a no-op ("none"). Page toast reports the outcome, counting Main no-ops separately.
+- Verified on-device in a throwaway TestAlbum: twin-in-Main → `copy-deleted`; album-only photo → `moved`; Main photo → `none`. TestAlbum and test files removed after. Final audit: 106 unique images; the 8 same-image pairs across Main/Us are intentional Add-to copies, not dupes.
+- Correction logged: in chat I first told him a photo "lives in exactly one album" and delete removes it everywhere — wrong under the copy model; corrected in the same conversation (delete removes that album's copy; another album's copy survives).
+- Pushed: portal-dashboard DashService.java, AndroidManifest.xml (6.20, vc 30), index.html. Undo: reinstall 6.19 + restore index.html from git.
+
 ## 2026-10-31 (12:40) — Duplicate photos cleaned (15 extra copies deleted)
 
 - His report: "some dupes added somehow." Byte-hash audit of all 121 photo files (106 unique images): 14 duplicate groups, 15 extra copies — whole batches sent twice. The big one dates to Oct 25: a ~10-photo batch stamped 12:39 arrived again at 12:52 (plus one at 13:19), from the era when the success page was a dead end and a send looked unconfirmed. The rest were today's 12:23 batch re-sent at 12:24, minutes before the 6.18 Add more prompt shipped.
