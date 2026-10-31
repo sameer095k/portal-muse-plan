@@ -4,6 +4,15 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-31 (13:22) — Landscape + Portrait albums, auto-tagged (DashServer 6.23)
+
+- His ask: "Can you make an album for landscape vs portrait? And would we be able to auto tag photos for one or other when they land?" + "And tag current photos into those albums."
+- Built: `orientationAlbum()` classifies by DISPLAYED orientation — BitmapFactory bounds, transposed when EXIF orientation is 5–8 (phone portrait shots are landscape pixels + a rotation flag); square counts as Landscape. Uploads auto-file a copy into their orientation album inside savePhotoParts (silent; the photo-add pages are unchanged). New `POST /api/photos/autofile` backfills: scans Main + all albums except the two orientation albums, md5-dedups (each unique image files once), skips already-filed. Same copy model as everything else.
+- Ran it: **filed 114, unknown 0** → Portrait 86, Landscape 28. (114 unique images across Main 75 + Us 42 — only 3 twin pairs remain; he'd been filing into Us and removing the Main copies, which is exactly the workflow the fixed unfile enables.) Rerun is idempotent (filed 0, already 114).
+- Verified independently: pulled both albums and re-checked every file with PIL (pixel size + EXIF rotation) — **0 mismatches**; 9 of the Portrait files are EXIF-rotated (raw pixels landscape) and classified correctly by displayed orientation. Fresh-upload test: a portrait PNG and a landscape JPG both landed in Main AND their orientation albums; test files deleted after, counts back to 75/86/28/42.
+- Not built (not asked): auto-switching the slideshow album when the Portal rotates. The chips switch in one tap and the choice persists.
+- Pushed: portal-dashboard DashService.java `b5101a18`, AndroidManifest.xml `0d2fd66e` (6.23, vc 33). Undo: reinstall 6.22; the two album folders can be deleted in-app.
+
 ## 2026-10-31 (13:05) — Portrait photo bars rebuilt + grid sort by added/taken (DashServer 6.22)
 
 - His asks: "Vertical layout of this photo album with edit buttons and everything needs work" → approved the two-row/stacked design → then mid-work: "What is the sort on edit page? Maybe add option for last add and actual photo date?" (Old answer: filename order = oldest added first — new photos sat at the very bottom of the grid.)
