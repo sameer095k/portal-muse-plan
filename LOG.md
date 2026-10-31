@@ -4,6 +4,13 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-31 (12:52) — Remove from album fixed to work FROM Main too (DashServer 6.21)
+
+- His catch, minutes after 6.20: "Removed from main but they stayed?" — the first unfile treated Main as an untouchable home base (Main photos were no-ops), so removing from Main did nothing.
+- Corrected semantics: the copy leaves whatever folder it sits in, Main included; the image survives if a copy (md5 twin) lives in any OTHER folder (Main or any album). Album copy with no twin → still moves to Main. Main photo with no twin anywhere = the only copy → kept, action `only-copy`, toast "Only copy — use Delete to remove it" (destroying the last copy is Delete's job, not this button's).
+- Verified all cases on-device: Main copy with album twin → `copy-deleted` (album copy survives); that copy then unfiled → `moved` back to Main; only-copy Main photo → `only-copy`, file intact; album-only photo → `moved`. Library hash-diffed identical before and after the whole test round. (One scare mid-test was mine: I picked a test filename off the pre-cleanup hash list — it had been a deleted dupe; the kept twin was untouched throughout.)
+- Pushed: portal-dashboard DashService.java, AndroidManifest.xml (6.21, vc 31), index.html. Undo: reinstall 6.20.
+
 ## 2026-10-31 (12:47) — Remove from album SHIPPED (DashServer 6.20 + page)
 
 - Context: albums are copy-based since the multi-album change ("Add to" copies; delete is per-copy; /api/photos/move is unreferenced by the page — "we got rid of move"). He asked for a way to take a photo OUT of an album without deleting it.
