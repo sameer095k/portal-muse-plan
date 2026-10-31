@@ -4,6 +4,15 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-31 (13:05) — Portrait photo bars rebuilt + grid sort by added/taken (DashServer 6.22)
+
+- His asks: "Vertical layout of this photo album with edit buttons and everything needs work" → approved the two-row/stacked design → then mid-work: "What is the sort on edit page? Maybe add option for last add and actual photo date?" (Old answer: filename order = oldest added first — new photos sat at the very bottom of the grid.)
+- Portrait bars (page CSS, `@media (orientation: portrait)` only; landscape untouched): #phbar flex-wraps with explicit order into two even rows of nowrap buttons (Prev/Next/Add photos · Edit/Show only this/⚙); #pheditbar becomes a grid — "info info info done" / "sel add remove del" — selection count + Done on top, album select + Add to + Remove from album + Delete in one full-width row; #phscroll bottom padding 216px so the grid scrolls clear.
+- Sort: SORT chips in the settings sheet (Date added / Date taken), PHSORT persisted exactly like PHORDER (localStorage + ui-state `sort` field, server-validated, seeded on first run). derivePhotos sorts newest-first by the chosen key, so the grid and sequential playback agree; shuffle unaffected. Date added = filename upload stamp (yyyyMMdd-HHmmss), ?v= mtime fallback. Date taken = EXIF: server reads via android.media.ExifInterface (DateTimeOriginal → DateTime) and serves a `meta` map on /api/photos; no EXIF → added.
+- Verified: /api/photos in 0.5s with meta for 114/117 files; server value cross-checked against PIL on a pulled file (2025-09-15 07:11:50 — exact). On-device portrait screencaps: new view bar, edit bar + grid (top-left cell = the PNG he added at 12:56), settings sheet with SORT, live toggle to Date taken (chip flips, grid visibly reorders — most-recent-taken first = the Sep 2026 stage photo, matching the data check). His state restored after: rail back off (immersive), sort left on Date added, album Main.
+- Inspo noted for him, not built: Aura's landscape pairing of two portrait photos side-by-side (only real steal-worthy idea from the frame research); Google Photos' selection pattern (count + bottom action bar) matches what shipped.
+- Pushed: portal-dashboard DashService.java `8a33e63e`, AndroidManifest.xml `74be4ce4` (6.22, vc 32), index.html `5f6d01bf`. Undo: reinstall 6.21 + previous page.
+
 ## 2026-10-31 (12:52) — Remove from album fixed to work FROM Main too (DashServer 6.21)
 
 - His catch, minutes after 6.20: "Removed from main but they stayed?" — the first unfile treated Main as an untouchable home base (Main photos were no-ops), so removing from Main did nothing.
