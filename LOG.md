@@ -4,6 +4,11 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-31 (12:40) — Duplicate photos cleaned (15 extra copies deleted)
+
+- His report: "some dupes added somehow." Byte-hash audit of all 121 photo files (106 unique images): 14 duplicate groups, 15 extra copies — whole batches sent twice. The big one dates to Oct 25: a ~10-photo batch stamped 12:39 arrived again at 12:52 (plus one at 13:19), from the era when the success page was a dead end and a send looked unconfirmed. The rest were today's 12:23 batch re-sent at 12:24, minutes before the 6.18 Add more prompt shipped.
+- Cleanup: kept the earliest copy of each image, deleted the 15 later copies and their orphaned thumbnails. Verified by re-hash: 106 files, 106 unique, zero duplicates left.
+
 ## 2026-10-31 (12:35) — Photo-add capped at 15 per add (DashServer 6.19)
 
 - His follow-up to 6.18: add a note to only allow so many photos per add — "I feel like I can get 15 at a time." Made it a real cap, not just a note (a note alone would have been a lie): `savePhotoParts` saves at most 15 file parts per POST and counts the rest as skipped; the picker page now reads "Up to 15 photos at a time," and when a batch overflows, the success page says "N left off — 15 max per add" above the Add more? prompt — so the add-more loop is exactly how you send the rest. The 80 MB whole-request cap is unchanged.
