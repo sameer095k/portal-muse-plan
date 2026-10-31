@@ -4,6 +4,12 @@ Newest first. Every change made on the device gets an entry: what, the exact
 command, and its undo. Sessions where Sameer's hands are on the device and
 Muse is remote eyes get dated headers like his TV project logs.
 
+## 2026-10-31 (12:35) — Photo-add capped at 15 per add (DashServer 6.19)
+
+- His follow-up to 6.18: add a note to only allow so many photos per add — "I feel like I can get 15 at a time." Made it a real cap, not just a note (a note alone would have been a lie): `savePhotoParts` saves at most 15 file parts per POST and counts the rest as skipped; the picker page now reads "Up to 15 photos at a time," and when a batch overflows, the success page says "N left off — 15 max per add" above the Add more? prompt — so the add-more loop is exactly how you send the rest. The 80 MB whole-request cap is unchanged.
+- Verified: a real 17-photo POST returned "Added 15 photos / 2 left off" and the folder gained exactly 15; all 15 test files then deleted and the folder diffed back to its pre-test state (96 files).
+- Pushed: portal-dashboard DashService.java + AndroidManifest.xml (6.19, vc 29). Undo: reinstall 6.18.
+
 ## 2026-10-31 (12:27) — Photo-add asks "Add more?" after an upload (DashServer 6.18)
 
 - His two-part ask: does add-photo have a per-send limit, and after adding it should prompt whether to add more. Code answer on the limit: no count limit — the form takes multiple files and the server saves every part; the only cap is the whole request at 80 MB (Content-Length check in handlePhotoAdd), plus a 60 s socket timeout.
